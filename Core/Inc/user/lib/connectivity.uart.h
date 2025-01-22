@@ -14,10 +14,11 @@ typedef struct _Uart {
   uint8_t tx_buffer[UART_TX_BUFFER_SIZE];
   uint8_t tx_queue[UART_TX_BUFFER_SIZE];
   volatile uint8_t received_byte;
-  void (*on_receive)(char*, uint32_t);
+  void (*on_receive)(struct _Uart* uart, char*, uint32_t);
 } Uart;
 
-Uart* new_uart(UART_HandleTypeDef* uart_device, void (*on_receive)(char*, uint32_t));
+Uart* new_uart(UART_HandleTypeDef* uart_device,
+               void (*on_receive)(char*, uint32_t));
 void delete_uart(Uart* uart);
 void uart_start_receive(Uart* uart);
 void uart_send(Uart* uart, char* message);

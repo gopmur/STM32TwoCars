@@ -56,7 +56,7 @@ void uart_receive_completed_callback(Uart* uart) {
   if (uart->received_byte == '\r') {
     uart->rx_buffer[uart->rx_buffer_index] = '\0';
     if (uart->on_receive) {
-      uart->on_receive((char*)uart->rx_buffer, uart->rx_buffer_index);
+      uart->on_receive(uart, (char*)uart->rx_buffer, uart->rx_buffer_index);
       uart_send(uart, "\r");
     }
     uart->rx_buffer_index = 0;
