@@ -2,8 +2,10 @@
 
 #include "cmsis_os.h"
 
+#include "connectivity.uart.h"
+
 #define APB2_CLOCK_FREQUENCY 48000000
 
-extern osThreadId button_interrupt_thread_handle;
+extern Uart *uart;
 
 void setup();

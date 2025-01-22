@@ -1,43 +1,34 @@
 #include <malloc.h>
 #include <memory.h>
 
+#include "cmsis_os.h"
+
 #include "button.h"
+#include "connectivity.uart.h"
 #include "helper.h"
 #include "virt_timer.h"
+
+extern Uart* uart;
 
 Button* button_pool[PHYSICAL_BUTTON_COUNT] = {NULL};
 ButtonInterruptHandler button_interrupt_handler;
 
-void init_buttons(TIM_HandleTypeDef* debounce_timer) {
-  button_interrupt_handler.busy = false;
-  button_interrupt_handler.interrupted_pin = 0;
-  button_interrupt_handler.debounce_timer = debounce_timer;
-}
+osThreadId button_interrupt_thread_handle;
+uint16_t interrupted_pin;
 
-void handle_button_interrupt(uint16_t pin) {
-  if (button_interrupt_handler.busy)
-    return;
-  uint8_t pin_number = get_pin_number(pin);
-  if (button_pool[pin_number] == NULL)
-    return;
-  button_interrupt_handler.busy = true;
-  button_interrupt_handler.interrupted_pin = pin;
-  button_interrupt_handler.debounce_timer->Instance->CNT = 0;
-  HAL_TIM_Base_Start_IT(button_interrupt_handler.debounce_timer);
-}
-
-void debounce_timer_callback() {
-  HAL_TIM_Base_Stop_IT(button_interrupt_handler.debounce_timer);
-  button_interrupt_handler.busy = false;
-  uint8_t pin_number = get_pin_number(button_interrupt_handler.interrupted_pin);
-  Button* button = button_pool[pin_number];
-  if (button == NULL)
-    return;
-  bool is_high = HAL_GPIO_ReadPin(button->port, button->pin);
-  if (!is_high)
-    return;
-  if (button->on_press)
-    button->on_press(button->on_press_arg);
+void button_interrupt_thread(void* args) {
+  while (true) {
+    vTaskSuspend(NULL);
+    uint8_t pin_number = get_pin_number(interrupted_pin);
+    if (button_pool[pin_number] == NULL)
+      continue;
+    Button* button = button_pool[pin_number];
+    osDelay(DEBOUNCE_DELAY_MS);
+    bool is_high = HAL_GPIO_ReadPin(button->port, button->pin);
+    if (is_high) {
+      button->on_press(button->on_press_arg);
+    }
+  }
 }
 
 Button* new_button(GPIO_TypeDef* port,
@@ -45,8 +36,20 @@ Button* new_button(GPIO_TypeDef* port,
                    void (*on_press)(void*),
                    void* on_press_arg,
                    uint32_t on_press_arg_size) {
-  uint8_t pin_number = get_pin_number(pin);
+  EXEC_ONCE({
+    osThreadDef(button_interrupt, button_interrupt_thread, osPriorityNormal, 0,
+                128);
+    button_interrupt_thread_handle =
+        osThreadCreate(osThread(button_interrupt), NULL);
+    if (button_interrupt_thread_handle == NULL) {
+      uart_sendln(uart,
+                  "log: button_interrupt thread did not start successfully");
+    } else {
+      uart_sendln(uart, "log: button_interrupt thread started successfully");
+    }
+  })
 
+  uint8_t pin_number = get_pin_number(pin);
   if (pin_number > PHYSICAL_BUTTON_COUNT || button_pool[pin_number] != NULL)
     return NULL;
   Button* button = (Button*)malloc(sizeof(Button));

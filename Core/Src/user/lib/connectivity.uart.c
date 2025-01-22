@@ -28,7 +28,7 @@ Uart* new_uart(UART_HandleTypeDef* uart_device,
                void (*on_receive)(char*, uint32_t)) {
   uint8_t uart_number = uart_device_get_number(uart_device);
   if (uart_pool[uart_number] != NULL)
-    return;
+    return NULL;
   Uart* uart = (Uart*)malloc(sizeof(Uart));
   uart->device = uart_device;
   uart->rx_buffer_index = 0;
