@@ -6,11 +6,19 @@
 #include "helper.h"
 #include "key_pad.h"
 #include "lcd.h"
+#include "music_player.h"
+#include "pwm.h"
+#include "notes.h"
 
 #include <stdbool.h>
 
 extern UART_HandleTypeDef huart1;
+extern TIM_HandleTypeDef htim2;
 
+TIM_HandleTypeDef* buzzer_timer = &htim2;
+
+Pwm buzzer;
+MusicPlayer music_player;
 Uart* uart;
 
 void message_receive_callback(Uart* uart,
@@ -37,6 +45,9 @@ void keypad_callback(uint8_t i, uint8_t j) {
 }
 
 void main_thread(void* arg) {
+  osDelay(500);
+  uart_sendln(uart, "main_thread");
+  music_player_play(&music_player, doom_melody, 100);
   while (true) {
   }
 }
@@ -74,6 +85,9 @@ void os_setup() {
   } else {
     uart_sendln(uart, "log: display thread started successfully");
   }
+
+  buzzer = new_pwm(buzzer_timer, TIM_CHANNEL_1, APB2_CLOCK_FREQUENCY);
+  music_player = new_music_player(&buzzer);
 }
 
 void setup() {
