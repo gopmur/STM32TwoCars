@@ -9,6 +9,7 @@
 #include "music_player.h"
 #include "notes.h"
 #include "pwm.h"
+#include "seven_segment.h"
 
 #include <stdbool.h>
 
@@ -20,6 +21,7 @@ TIM_HandleTypeDef* buzzer_timer = &htim2;
 Pwm buzzer;
 MusicPlayer* music_player;
 Uart* uart;
+SevenSegment* seven_segment;
 
 void message_receive_callback(Uart* uart,
                               char* message,
@@ -70,7 +72,7 @@ void peripheral_setup() {
 }
 
 void os_setup() {
-  osThreadDef(mainThread, main_thread, osPriorityNormal, 0, 128);
+  osThreadDef(mainThread, main_thread, osPriorityNormal, 0, 128 * 4);
   osThreadId main_thread_handle = osThreadCreate(osThread(mainThread), NULL);
   if (main_thread_handle == NULL) {
     uart_sendln(uart, "log: main thread did not start successfully");
@@ -78,8 +80,9 @@ void os_setup() {
     uart_sendln(uart, "log: main thread started successfully");
   }
 
-  osThreadDef(displayThread, display_thread, osPriorityNormal, 0, 128);
-  osThreadId display_thread_handle = osThreadCreate(osThread(displayThread), NULL);
+  osThreadDef(displayThread, display_thread, osPriorityNormal, 0, 128 * 4);
+  osThreadId display_thread_handle =
+      osThreadCreate(osThread(displayThread), NULL);
   if (display_thread_handle == NULL) {
     uart_sendln(uart, "log: display thread did not start successfully");
   } else {
@@ -88,6 +91,33 @@ void os_setup() {
 
   buzzer = new_pwm(buzzer_timer, TIM_CHANNEL_1, APB2_CLOCK_FREQUENCY);
   music_player = new_music_player(&buzzer);
+  seven_segment = new_seven_segment(
+      (uint16_t[]){
+          SVN_SEG_D1_Pin,
+          SVN_SEG_D2_Pin,
+          SVN_SEG_D3_Pin,
+          SVN_SEG_D4_Pin,
+      },
+      SVN_SEG_DP_Pin,
+      (uint16_t[]){
+          SVN_SEG_BCD1_Pin,
+          SVN_SEG_BCD2_Pin,
+          SVN_SEG_BCD3_Pin,
+          SVN_SEG_BCD4_Pin,
+      },
+      (GPIO_TypeDef*[]){
+          SVN_SEG_D1_GPIO_Port,
+          SVN_SEG_D2_GPIO_Port,
+          SVN_SEG_D3_GPIO_Port,
+          SVN_SEG_D4_GPIO_Port,
+      },
+      SVN_SEG_DP_GPIO_Port,
+      (GPIO_TypeDef*[]){
+          SVN_SEG_BCD1_GPIO_Port,
+          SVN_SEG_BCD2_GPIO_Port,
+          SVN_SEG_BCD3_GPIO_Port,
+          SVN_SEG_BCD4_GPIO_Port,
+      });
 }
 
 void setup() {

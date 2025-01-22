@@ -133,6 +133,8 @@ void Error_Handler(void);
 #define LCD_D6_GPIO_Port GPIOD
 #define LCD_D7_Pin GPIO_PIN_14
 #define LCD_D7_GPIO_Port GPIOD
+#define SVN_SEG_DP_Pin GPIO_PIN_15
+#define SVN_SEG_DP_GPIO_Port GPIOD
 #define DM_Pin GPIO_PIN_11
 #define DM_GPIO_Port GPIOA
 #define DP_Pin GPIO_PIN_12

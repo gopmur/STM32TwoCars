@@ -1,35 +1,43 @@
+#include <malloc.h>
 #include <math.h>
 #include <stdbool.h>
 #include <string.h>
+
+#include "cmsis_os.h"
 
 #include "helper.h"
 #include "main.h"
 #include "seven_segment.h"
 
-void seven_segment_thread() {
-  
+void seven_segment_thread(SevenSegment* seven_segment) {
+  while (true) {
+    seven_segment_loop(seven_segment);
+    osDelay(SEVEN_SEGMENT_UPDATE_PERIOD_MS);
+  }
 }
 
-SevenSegment new_seven_segment(uint16_t digit_pins[4],
-                               uint16_t dp_pin,
-                               uint16_t bcd_pins[4],
-                               GPIO_TypeDef* digit_ports[4],
-                               GPIO_TypeDef* dp_port,
-                               GPIO_TypeDef* bcd_ports[4]) {
-  SevenSegment seven_segment = {
-      .dp_pin = dp_pin,
-      .dp_port = dp_port,
-  };
-  memcpy(seven_segment.digit_pins, digit_pins, sizeof(uint16_t) * 4);
-  memcpy(seven_segment.bcd_pins, bcd_pins, sizeof(uint16_t) * 4);
-  memcpy(seven_segment.digit_ports, digit_ports, sizeof(GPIO_TypeDef*) * 4);
-  memcpy(seven_segment.bcd_ports, bcd_ports, sizeof(GPIO_TypeDef*) * 4);
+SevenSegment* new_seven_segment(uint16_t digit_pins[4],
+                                uint16_t dp_pin,
+                                uint16_t bcd_pins[4],
+                                GPIO_TypeDef* digit_ports[4],
+                                GPIO_TypeDef* dp_port,
+                                GPIO_TypeDef* bcd_ports[4]) {
+  SevenSegment* seven_segment = malloc(sizeof(SevenSegment));
+  seven_segment->dp_pin = dp_pin;
+  seven_segment->dp_port = dp_port;
+  memcpy(seven_segment->digit_pins, digit_pins, sizeof(uint16_t) * 4);
+  memcpy(seven_segment->bcd_pins, bcd_pins, sizeof(uint16_t) * 4);
+  memcpy(seven_segment->digit_ports, digit_ports, sizeof(GPIO_TypeDef*) * 4);
+  memcpy(seven_segment->bcd_ports, bcd_ports, sizeof(GPIO_TypeDef*) * 4);
   for (int i = 0; i < SEVEN_SEGMENT_DIGIT_COUNT; i++) {
-    seven_segment.digits[i] = SEVEN_SEGMENT_DISABLED_DIGIT;
+    seven_segment->digits[i] = SEVEN_SEGMENT_DISABLED_DIGIT;
   }
   for (int i = 0; i < SEVEN_SEGMENT_DIGIT_COUNT; i++) {
-    seven_segment.decimal_points[i] = false;
+    seven_segment->decimal_points[i] = false;
   }
+  osThreadDef(sevenSegmentThread, seven_segment_thread, osPriorityNormal, 0,
+              128 * 4);
+  osThreadCreate(osThread(sevenSegmentThread), seven_segment);
   return seven_segment;
 }
 
@@ -93,6 +101,7 @@ void seven_segment_loop(SevenSegment* seven_segment) {
   digit_index++;
   digit_index %= SEVEN_SEGMENT_DIGIT_COUNT;
 }
+
 void seven_segment_set_digit(SevenSegment* seven_segment,
                              uint8_t digit_value,
                              uint8_t digit_index) {

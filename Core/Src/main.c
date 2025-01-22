@@ -511,9 +511,9 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, LCD_RS_Pin|LCD_RW_Pin|LCD_E_Pin|LCD_D4_Pin
-                          |LCD_D5_Pin|LCD_D6_Pin|LCD_D7_Pin|SVN_SEG_D1_Pin
-                          |SVN_SEG_D2_Pin|SVN_SEG_D3_Pin|SVN_SEG_D4_Pin|SVN_SEG_BCD1_Pin
-                          |SVN_SEG_BCD2_Pin|SVN_SEG_BCD3_Pin|SVN_SEG_BCD4_Pin, GPIO_PIN_RESET);
+                          |LCD_D5_Pin|LCD_D6_Pin|LCD_D7_Pin|SVN_SEG_DP_Pin
+                          |SVN_SEG_D1_Pin|SVN_SEG_D2_Pin|SVN_SEG_D3_Pin|SVN_SEG_D4_Pin
+                          |SVN_SEG_BCD1_Pin|SVN_SEG_BCD2_Pin|SVN_SEG_BCD3_Pin|SVN_SEG_BCD4_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : DRDY_Pin MEMS_INT3_Pin MEMS_INT4_Pin MEMS_INT1_Pin
                            MEMS_INT2_Pin */
@@ -554,13 +554,13 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pins : LCD_RS_Pin LCD_RW_Pin LCD_E_Pin LCD_D4_Pin
-                           LCD_D5_Pin LCD_D6_Pin LCD_D7_Pin SVN_SEG_D1_Pin
-                           SVN_SEG_D2_Pin SVN_SEG_D3_Pin SVN_SEG_D4_Pin SVN_SEG_BCD1_Pin
-                           SVN_SEG_BCD2_Pin SVN_SEG_BCD3_Pin SVN_SEG_BCD4_Pin */
+                           LCD_D5_Pin LCD_D6_Pin LCD_D7_Pin SVN_SEG_DP_Pin
+                           SVN_SEG_D1_Pin SVN_SEG_D2_Pin SVN_SEG_D3_Pin SVN_SEG_D4_Pin
+                           SVN_SEG_BCD1_Pin SVN_SEG_BCD2_Pin SVN_SEG_BCD3_Pin SVN_SEG_BCD4_Pin */
   GPIO_InitStruct.Pin = LCD_RS_Pin|LCD_RW_Pin|LCD_E_Pin|LCD_D4_Pin
-                          |LCD_D5_Pin|LCD_D6_Pin|LCD_D7_Pin|SVN_SEG_D1_Pin
-                          |SVN_SEG_D2_Pin|SVN_SEG_D3_Pin|SVN_SEG_D4_Pin|SVN_SEG_BCD1_Pin
-                          |SVN_SEG_BCD2_Pin|SVN_SEG_BCD3_Pin|SVN_SEG_BCD4_Pin;
+                          |LCD_D5_Pin|LCD_D6_Pin|LCD_D7_Pin|SVN_SEG_DP_Pin
+                          |SVN_SEG_D1_Pin|SVN_SEG_D2_Pin|SVN_SEG_D3_Pin|SVN_SEG_D4_Pin
+                          |SVN_SEG_BCD1_Pin|SVN_SEG_BCD2_Pin|SVN_SEG_BCD3_Pin|SVN_SEG_BCD4_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
