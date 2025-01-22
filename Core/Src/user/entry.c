@@ -70,16 +70,16 @@ void peripheral_setup() {
 }
 
 void os_setup() {
-  osThreadDef(main, main_thread, osPriorityNormal, 0, 128);
-  osThreadId main_thread_handle = osThreadCreate(osThread(main), NULL);
+  osThreadDef(mainThread, main_thread, osPriorityNormal, 0, 128);
+  osThreadId main_thread_handle = osThreadCreate(osThread(mainThread), NULL);
   if (main_thread_handle == NULL) {
     uart_sendln(uart, "log: main thread did not start successfully");
   } else {
     uart_sendln(uart, "log: main thread started successfully");
   }
 
-  osThreadDef(display, display_thread, osPriorityNormal, 0, 128);
-  osThreadId display_thread_handle = osThreadCreate(osThread(display), NULL);
+  osThreadDef(displayThread, display_thread, osPriorityNormal, 0, 128);
+  osThreadId display_thread_handle = osThreadCreate(osThread(displayThread), NULL);
   if (display_thread_handle == NULL) {
     uart_sendln(uart, "log: display thread did not start successfully");
   } else {

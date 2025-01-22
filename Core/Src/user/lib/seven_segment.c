@@ -6,6 +6,10 @@
 #include "main.h"
 #include "seven_segment.h"
 
+void seven_segment_thread() {
+  
+}
+
 SevenSegment new_seven_segment(uint16_t digit_pins[4],
                                uint16_t dp_pin,
                                uint16_t bcd_pins[4],

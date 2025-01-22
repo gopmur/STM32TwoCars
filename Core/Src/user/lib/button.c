@@ -37,10 +37,10 @@ Button* new_button(GPIO_TypeDef* port,
                    void* on_press_arg,
                    uint32_t on_press_arg_size) {
   EXEC_ONCE({
-    osThreadDef(button_interrupt, button_interrupt_thread, osPriorityNormal, 0,
+    osThreadDef(ButtonInterruptThread, button_interrupt_thread, osPriorityNormal, 0,
                 128);
     button_interrupt_thread_handle =
-        osThreadCreate(osThread(button_interrupt), NULL);
+        osThreadCreate(osThread(ButtonInterruptThread), NULL);
     if (button_interrupt_thread_handle == NULL) {
       uart_sendln(uart,
                   "log: button_interrupt thread did not start successfully");

@@ -66,8 +66,8 @@ MusicPlayer* new_music_player(Pwm* device) {
   music_player->tempo = 0;
   music_player->command_queue = xQueueCreate(3, sizeof(MusicPlayerCommand));
 
-  osThreadDef(music_player, music_player_thread, osPriorityNormal, 0, 128);
-  osThreadCreate(osThread(music_player), music_player);
+  osThreadDef(musicPlayerThread, music_player_thread, osPriorityNormal, 0, 128);
+  osThreadCreate(osThread(musicPlayerThread), music_player);
   return music_player;
 }
 
