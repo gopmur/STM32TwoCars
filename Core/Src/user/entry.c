@@ -51,9 +51,13 @@ void display_thread(void* args) {
     ON_VAR_CHANGE(game.state, { lcd_clear(&lcd); });
     switch (game.state) {
       case GameStateFirstPage:
-        lcd_print(&lcd, "Two Cars", 0, 0);
+        lcd_print(&lcd, 0, 0, "Two Cars");
         break;
       case GameStateMainMenu:
+        lcd_print(&lcd, 0, 0, "Main Menu");
+        lcd_printf(&lcd, 0, 1, "%c Start", '>');
+        lcd_printf(&lcd, 0, 2, "%c Settings", ' ');
+        lcd_printf(&lcd, 0, 3, "%c Exit", ' ');
         break;
       case GameStatePlaying:
         break;

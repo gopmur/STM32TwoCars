@@ -22,5 +22,6 @@ Lcd new_lcd(GPIO_TypeDef* port,
             uint8_t width,
             uint8_t height);
 void lcd_clear(Lcd* lcd);
-void lcd_write(Lcd* lcd, char c, uint8_t x, uint8_t y);
-void lcd_print(Lcd* lcd, const char* str, uint8_t x, uint8_t y);
+void lcd_write(Lcd* lcd, uint8_t x, uint8_t y, char c);
+void lcd_print(Lcd* lcd, uint8_t x, uint8_t y, const char* str);
+void lcd_printf(Lcd* lcd, uint8_t x, uint8_t y, const char* str, ...);

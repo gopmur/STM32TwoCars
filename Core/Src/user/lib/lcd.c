@@ -1,6 +1,8 @@
 #include <malloc.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdarg.h>
+#include <stdio.h>
 
 #include "LiquidCrystal.h"
 
@@ -85,7 +87,7 @@ void lcd_set_cursor(Lcd* lcd, uint8_t x, uint8_t y) {
   setCursor(x, y);
 }
 
-void lcd_write(Lcd* lcd, char c, uint8_t x, uint8_t y) {
+void lcd_write(Lcd* lcd, uint8_t x, uint8_t y, char c) {
   char(*current_display)[lcd->width] =
       (char(*)[lcd->width])lcd->current_display;
   if (current_display[y][x] == c) {
@@ -101,12 +103,21 @@ void lcd_write(Lcd* lcd, char c, uint8_t x, uint8_t y) {
   lcd_inc_cursor(lcd);
 }
 
-void lcd_print(Lcd* lcd, const char* str, uint8_t x, uint8_t y) {
+void lcd_print(Lcd* lcd, uint8_t x, uint8_t y, const char* str) {
   uint32_t str_len = strlen(str);
   if (str_len == 0)
     return;
   for (uint8_t str_index = 0; str_index < str_len; str_index++) {
-    lcd_write(lcd, str[str_index], x, y);
+    lcd_write(lcd, x, y, str[str_index]);
     inc_cursor(&x, &y);
   }
+}
+
+void lcd_printf(Lcd* lcd, uint8_t x, uint8_t y, const char* str, ...) {
+  va_list args;
+  va_start(args, str);
+  char buffer[lcd->width];
+  vsprintf(buffer, str, args);
+  lcd_print(lcd, x, y, buffer);
+  va_end(args);
 }
