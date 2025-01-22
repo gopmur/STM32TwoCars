@@ -28,7 +28,6 @@ void unmask_all_button_interrupts(KeyPad* key_pad) {
 }
 
 void on_row_press(OnRowPressArg* arg) {
-  ;
   KeyPad* key_pad = arg->key_pad;
   uint32_t row = arg->row;
   mask_all_button_interrupts(key_pad);

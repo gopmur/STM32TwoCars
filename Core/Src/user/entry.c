@@ -2,9 +2,9 @@
 #include "cmsis_os.h"
 #include "main.h"
 
-#include "button.h"
 #include "connectivity.uart.h"
 #include "helper.h"
+#include "key_pad.h"
 #include "lcd.h"
 
 #include <stdbool.h>
@@ -32,8 +32,8 @@ void display_thread(void* args) {
   }
 }
 
-void button_callback(void* args) {
-  HAL_GPIO_TogglePin(LD10_GPIO_Port, LD10_Pin);
+void keypad_callback(uint8_t i, uint8_t j) {
+  uart_sendf(uart, "keypad_callback: %d %d\n", i, j);
 }
 
 void main_thread(void* arg) {
@@ -44,23 +44,18 @@ void main_thread(void* arg) {
 void peripheral_setup() {
   uart = new_uart(&huart1, NULL);
   uart_sendln(uart, "\n\n\n\nsystem start");
-  HAL_GPIO_WritePin(KEY_PAD_COL_1_EN_GPIO_Port, KEY_PAD_COL_1_EN_Pin,
-                    GPIO_PIN_SET);
-  HAL_GPIO_WritePin(KEY_PAD_COL_2_EN_GPIO_Port, KEY_PAD_COL_2_EN_Pin,
-                    GPIO_PIN_SET);
-  HAL_GPIO_WritePin(KEY_PAD_COL_3_EN_GPIO_Port, KEY_PAD_COL_3_EN_Pin,
-                    GPIO_PIN_SET);
-  HAL_GPIO_WritePin(KEY_PAD_COL_4_EN_GPIO_Port, KEY_PAD_COL_4_EN_Pin,
-                    GPIO_PIN_SET);
-
-  new_button(KEY_PAD_ROW_1_EXTI_GPIO_Port, KEY_PAD_ROW_1_EXTI_Pin,
-             button_callback, NULL, 0);
-  new_button(KEY_PAD_ROW_2_EXTI_GPIO_Port, KEY_PAD_ROW_2_EXTI_Pin,
-             button_callback, NULL, 0);
-  new_button(KEY_PAD_ROW_3_EXTI_GPIO_Port, KEY_PAD_ROW_3_EXTI_Pin,
-             button_callback, NULL, 0);
-  new_button(KEY_PAD_ROW_4_EXTI_GPIO_Port, KEY_PAD_ROW_4_EXTI_Pin,
-             button_callback, NULL, 0);
+  new_key_pad(
+      4, 4,
+      (GPIO_TypeDef*[]){KEY_PAD_COL_1_EN_GPIO_Port, KEY_PAD_COL_2_EN_GPIO_Port,
+                        KEY_PAD_COL_3_EN_GPIO_Port, KEY_PAD_COL_4_EN_GPIO_Port},
+      (GPIO_TypeDef*[]){
+          KEY_PAD_ROW_1_EXTI_GPIO_Port, KEY_PAD_ROW_2_EXTI_GPIO_Port,
+          KEY_PAD_ROW_3_EXTI_GPIO_Port, KEY_PAD_ROW_4_EXTI_GPIO_Port},
+      (uint16_t[]){KEY_PAD_COL_1_EN_Pin, KEY_PAD_COL_2_EN_Pin,
+                   KEY_PAD_COL_3_EN_Pin, KEY_PAD_COL_4_EN_Pin},
+      (uint16_t[]){KEY_PAD_ROW_1_EXTI_Pin, KEY_PAD_ROW_2_EXTI_Pin,
+                   KEY_PAD_ROW_3_EXTI_Pin, KEY_PAD_ROW_4_EXTI_Pin},
+      keypad_callback);
 }
 
 void os_setup() {
