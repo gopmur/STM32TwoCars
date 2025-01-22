@@ -7,8 +7,8 @@
 #include "key_pad.h"
 #include "lcd.h"
 #include "music_player.h"
-#include "pwm.h"
 #include "notes.h"
+#include "pwm.h"
 
 #include <stdbool.h>
 
@@ -18,7 +18,7 @@ extern TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef* buzzer_timer = &htim2;
 
 Pwm buzzer;
-MusicPlayer music_player;
+MusicPlayer* music_player;
 Uart* uart;
 
 void message_receive_callback(Uart* uart,
@@ -47,7 +47,7 @@ void keypad_callback(uint8_t i, uint8_t j) {
 void main_thread(void* arg) {
   osDelay(500);
   uart_sendln(uart, "main_thread");
-  music_player_play(&music_player, doom_melody, 100);
+  music_player_play(music_player, doom_melody, 100, true);
   while (true) {
   }
 }

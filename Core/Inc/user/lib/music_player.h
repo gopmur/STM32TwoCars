@@ -8,8 +8,8 @@
 #include "pwm.h"
 
 typedef enum _MusicPlayerCommandType {
-  Play,
-  Stop,
+  MusicPlayerCommandPlay,
+  MusicPlayerCommandStop,
   Resume,
 } MusicPlayerCommandType;
 
@@ -19,9 +19,19 @@ typedef struct _MusicPlayerCommandPlayData {
   bool replay;
 } MusicPlayerCommandPlayData;
 
+typedef struct _MusicPlayerCommandStopData {
+} MusicPlayerCommandStopData;
+typedef struct _MusicPlayerCommandResumeData {
+} MusicPlayerCommandResumeData;
+typedef union _MusicPlayerCommandData {
+  MusicPlayerCommandPlayData play;
+  MusicPlayerCommandStopData stop;
+  MusicPlayerCommandResumeData resume;
+} MusicPlayerCommandData;
+
 typedef struct _MusicPlayerCommand {
   MusicPlayerCommandType type;
-  MusicPlayerCommandPlayData data;
+  MusicPlayerCommandData data;
 } MusicPlayerCommand;
 
 typedef struct _MusicPlayer {
@@ -35,7 +45,9 @@ typedef struct _MusicPlayer {
   QueueHandle_t command_queue;
 } MusicPlayer;
 
-MusicPlayer new_music_player(Pwm* device);
+MusicPlayer *new_music_player(Pwm* device);
 void music_player_play(MusicPlayer* music_player,
                        int16_t* melody,
-                       float volume);
+                       float volume,
+                       bool replay);
+void music_player_stop(MusicPlayer* music_player);

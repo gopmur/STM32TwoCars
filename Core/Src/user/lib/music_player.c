@@ -1,6 +1,8 @@
-#include "music_player.h"
+#include <malloc.h>
+
 #include "entry.h"
 #include "helper.h"
+#include "music_player.h"
 #include "music_player.helper.h"
 #include "notes.h"
 
@@ -12,8 +14,11 @@ void music_player_load_melody(MusicPlayer* music_player, int16_t* melody) {
 
 bool music_player_play_next_note(MusicPlayer* music_player) {
   int16_t note = music_player->current_melody[music_player->current_note_index];
-  if (note == END_OF_MELODY) {
+  if (note == END_OF_MELODY && !music_player->replay) {
     return false;
+  }
+  if (note == END_OF_MELODY) {
+    music_player->current_note_index = 2;
   }
   int16_t duration_divider =
       music_player->current_melody[music_player->current_note_index + 1];
@@ -31,53 +36,74 @@ void music_player_thread(MusicPlayer* music_player) {
   while (true) {
     // here we are in the waiting for command state
     xQueueReceive(music_player->command_queue, &command, portMAX_DELAY);
-    if (command.type != Play) {
+    if (command.type != MusicPlayerCommandPlay) {
       continue;
     }
     music_player->is_active = true;
-    music_player_load_melody(music_player, command.data.melody);
-    music_player->volume = command.data.volume;
+    music_player_load_melody(music_player, command.data.play.melody);
+    music_player->volume = command.data.play.volume;
+    music_player->replay = command.data.play.replay;
     pwm_start(music_player->device);
     while (music_player_play_next_note(music_player)) {
       xQueueReceive(music_player->command_queue, &command, 0);
-      if (command.type == Stop) {
-        music_player->is_active = false;
+      if (command.type == MusicPlayerCommandStop) {
         break;
       }
     }
+    music_player->is_active = false;
+    pwm_stop(music_player->device);
   }
 }
 
-MusicPlayer new_music_player(Pwm* device) {
-  MusicPlayer music_player = {
-      .device = device,
-      .current_melody = NULL,
-      .current_note_index = 0,
-      .is_active = false,
-      .replay = false,
-      .tempo = 0,
-      .command_queue = xQueueCreate(3, sizeof(MusicPlayerCommand)),
-  };
+MusicPlayer* new_music_player(Pwm* device) {
+  MusicPlayer* music_player = malloc(sizeof(MusicPlayer));
+
+  music_player->device = device;
+  music_player->current_melody = NULL;
+  music_player->current_note_index = 0;
+  music_player->is_active = false;
+  music_player->replay = false;
+  music_player->tempo = 0;
+  music_player->command_queue = xQueueCreate(3, sizeof(MusicPlayerCommand));
 
   osThreadDef(music_player, music_player_thread, osPriorityNormal, 0, 128);
-  osThreadCreate(osThread(music_player), &music_player);
+  osThreadCreate(osThread(music_player), music_player);
   return music_player;
 }
 
 void music_player_play(MusicPlayer* music_player,
                        int16_t* melody,
-                       float volume) {
+                       float volume,
+                       bool replay) {
   if (music_player->is_active || melody == NULL || melody[0] == 0 ||
       melody[1] != melody[0] || melody[2] == END_OF_MELODY)
     return;
   MusicPlayerCommand command = {
-      .type = Play,
-      .data =
+      .type = MusicPlayerCommandPlay,
+      .data.play =
           {
               .melody = melody,
               .volume = volume,
-              .replay = false,
+              .replay = replay,
           },
+  };
+  xQueueSend(music_player->command_queue, &command, 0);
+}
+
+void music_player_stop(MusicPlayer* music_player) {
+  if (!music_player->is_active)
+    return;
+  MusicPlayerCommand command = {
+      .type = MusicPlayerCommandStop,
+  };
+  xQueueSend(music_player->command_queue, &command, 0);
+}
+
+void music_player_resume(MusicPlayer* music_player) {
+  if (!music_player->is_active)
+    return;
+  MusicPlayerCommand command = {
+      .type = Resume,
   };
   xQueueSend(music_player->command_queue, &command, 0);
 }
