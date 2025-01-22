@@ -28,6 +28,14 @@
     }                             \
   }
 
+#define ON_VAR_CHANGE(var, code_block) \
+  {                                    \
+    static typeof(var) prev_var;       \
+    if (prev_var != var) {             \
+      code_block prev_var = var;       \
+    }                                  \
+  }
+
 void start_timer_by_period_ms_it(TIM_HandleTypeDef* timer,
                                  uint32_t period_ms,
                                  uint32_t clock_frequency);

@@ -43,22 +43,6 @@ uint32_t get_number_len(uint32_t number) {
   return len;
 }
 
-// GPIO_TypeDef* get_exti_button_port_by_pin(uint16_t pin) {
-//   switch (pin) {
-//     case BLUE_BTN_EXTI_Pin:
-//       return BLUE_BTN_EXTI_GPIO_Port;
-//       break;
-//     case BTN1_EXTI_Pin:
-//       return BTN1_EXTI_GPIO_Port;
-//       break;
-//     case BTN2_EXTI_Pin:
-//       return BTN2_EXTI_GPIO_Port;
-//       break;
-//     default:
-//       return NULL;
-//   }
-// }
-
 void fill_buffer(uint8_t* buffer, uint32_t buffer_size, uint8_t value) {
   for (int i = 0; i < buffer_size; i++) {
     buffer[i] = value;
