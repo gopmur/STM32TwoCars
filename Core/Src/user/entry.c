@@ -48,8 +48,8 @@ void keypad_callback(uint8_t i, uint8_t j) {
 
 void main_thread(void* arg) {
   osDelay(500);
-  uart_sendln(uart, "main_thread");
-  music_player_play(music_player, doom_melody, 100, true);
+  // uart_sendln(uart, "main_thread");
+  // music_player_play(music_player, doom_melody, 100, true);
   while (true) {
   }
 }
