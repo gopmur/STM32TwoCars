@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "cmsis_os.h"
-
 #include "connectivity.uart.h"
 #include "helper.h"
 #include "main.h"
@@ -26,38 +24,6 @@ uint8_t uart_device_get_number(UART_HandleTypeDef* uart_device) {
   return 0;
 }
 
-void uart_rx_thread(Uart* uart) {
-  uart_start_receive(uart);
-  while (true) {
-    ulTaskNotifyTake(false, portMAX_DELAY);
-    if (uart->received_byte == '\r') {
-      uart->rx_buffer[uart->rx_buffer_index] = '\0';
-      if (uart->on_receive) {
-        uart->on_receive(uart, (char*)uart->rx_buffer, uart->rx_buffer_index);
-        uart_send(uart, "\r");
-      }
-      uart->rx_buffer_index = 0;
-
-    } else {
-      uart->rx_buffer[uart->rx_buffer_index] = uart->received_byte;
-      uart->rx_buffer_index++;
-      uart->rx_buffer_index %= UART_RX_BUFFER_SIZE;
-    }
-    HAL_UART_Receive_IT(uart->device, (uint8_t*)&uart->received_byte, 1);
-  }
-}
-
-void uart_tx_thread(Uart* uart) {
-  while (true) {
-    ulTaskNotifyTake(false, portMAX_DELAY);
-    if (uart->tx_queue_index == 0)
-      return;
-    memcpy(uart->tx_buffer, uart->tx_queue, uart->tx_queue_index);
-    HAL_UART_Transmit_IT(uart->device, uart->tx_buffer, uart->tx_queue_index);
-    uart->tx_queue_index = 0;
-  }
-}
-
 Uart* new_uart(UART_HandleTypeDef* uart_device,
                void (*on_receive)(char*, uint32_t)) {
   uint8_t uart_number = uart_device_get_number(uart_device);
@@ -70,12 +36,7 @@ Uart* new_uart(UART_HandleTypeDef* uart_device,
   uart->on_receive = on_receive;
   if (uart_number != 0)
     uart_pool[uart_number - 1] = uart;
-
-  osThreadDef(uartRxThread, uart_rx_thread, osPriorityNormal, 0, 128);
-  uart->rx_thread = osThreadCreate(osThread(uartRxThread), uart);
-  osThreadDef(uartTxThread, uart_tx_thread, osPriorityNormal, 0, 128);
-  uart->tx_thread = osThreadCreate(osThread(uartTxThread), uart);
-
+  uart_start_receive(uart);
   return uart;
 }
 
@@ -91,6 +52,31 @@ void uart_start_receive(Uart* uart) {
                       sizeof(uint8_t));
 }
 
+void uart_receive_completed_callback(Uart* uart) {
+  if (uart->received_byte == '\r') {
+    uart->rx_buffer[uart->rx_buffer_index] = '\0';
+    if (uart->on_receive) {
+      uart->on_receive(uart, (char*)uart->rx_buffer, uart->rx_buffer_index);
+      uart_send(uart, "\r");
+    }
+    uart->rx_buffer_index = 0;
+    HAL_UART_Receive_IT(uart->device, (uint8_t*)&uart->received_byte, 1);
+    return;
+  }
+  uart->rx_buffer[uart->rx_buffer_index] = uart->received_byte;
+  uart->rx_buffer_index++;
+  uart->rx_buffer_index %= UART_RX_BUFFER_SIZE;
+  HAL_UART_Receive_IT(uart->device, (uint8_t*)&uart->received_byte, 1);
+}
+
+void uart_transmit_completed_callback(Uart* uart) {
+  if (uart->tx_queue_index == 0)
+    return;
+  memcpy(uart->tx_buffer, uart->tx_queue, uart->tx_queue_index);
+  HAL_UART_Transmit_IT(uart->device, uart->tx_buffer, uart->tx_queue_index);
+  uart->tx_queue_index = 0;
+}
+
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart) {
   UART_HandleTypeDef* uart_device = huart;
   uint8_t uart_number = uart_device_get_number(uart_device);
@@ -99,7 +85,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart) {
   Uart* uart = uart_pool[uart_number - 1];
   if (uart == NULL)
     return;
-  vTaskNotifyGiveFromISR(uart->rx_thread, NULL);
+  uart_receive_completed_callback(uart);
 }
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef* huart) {
@@ -110,7 +96,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef* huart) {
   Uart* uart = uart_pool[uart_number - 1];
   if (uart == NULL)
     return;
-  vTaskNotifyGiveFromISR(uart->tx_thread, NULL);
+  uart_transmit_completed_callback(uart);
 }
 
 void uart_enqueue_message(Uart* uart, char* message, uint32_t message_length) {

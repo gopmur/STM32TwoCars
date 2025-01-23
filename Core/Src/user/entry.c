@@ -105,7 +105,7 @@ void display_thread(void* args) {
 
         break;
     }
-    ulTaskNotifyTake(false, REFRESH_PERIOD_MS);
+    ulTaskNotifyTake(true, REFRESH_PERIOD_MS);
   }
 }
 
@@ -225,7 +225,7 @@ void peripheral_setup() {
 }
 
 void os_setup() {
-  osThreadDef(mainThread, main_thread, osPriorityNormal, 0, 128);
+  osThreadDef(mainThread, main_thread, osPriorityNormal, 0, 128 * 4);
   osThreadId main_thread_handle = osThreadCreate(osThread(mainThread), NULL);
   if (main_thread_handle == NULL) {
     uart_sendln(uart, "log: main thread did not start successfully");
@@ -233,7 +233,7 @@ void os_setup() {
     uart_sendln(uart, "log: main thread started successfully");
   }
 
-  osThreadDef(displayThread, display_thread, osPriorityNormal, 0, 128);
+  osThreadDef(displayThread, display_thread, osPriorityNormal, 0, 128 * 4);
   display_thread_handle = osThreadCreate(osThread(displayThread), NULL);
   if (display_thread_handle == NULL) {
     uart_sendln(uart, "log: display thread did not start successfully");
