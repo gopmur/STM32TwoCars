@@ -36,6 +36,9 @@
     }                                  \
   }
 
+#define CHAR_IF(condition, character) condition ? character : ' '  
+
+
 void start_timer_by_period_ms_it(TIM_HandleTypeDef* timer,
                                  uint32_t period_ms,
                                  uint32_t clock_frequency);

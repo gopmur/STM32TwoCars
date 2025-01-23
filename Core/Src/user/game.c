@@ -1,9 +1,24 @@
 #include "game.h"
 
+const char* MAIN_MENU_ENTRY_STRINGS[GameMainMenuEntryCount] = {
+    "Play",
+    "Settings",
+    "About",
+};
+
+const char* GAME_DIFFICULTY_STRING[GameDifficultyCount] = {
+    "Easy",
+    "Normal",
+    "Hard",
+};
+
 Game new_game() {
   Game game = {
-      .state = GameStateFirstPage,
-      .main_menu_selected_entry = GameMainMenuEntryPlay,
+      .state = DEFAULT_GAME_STATE,
+      .main_menu_selected_entry = DEFAULT_MAIN_MENU_ENTRY,
+      .settings_menu_selected_entry = DEFAULT_SETTINGS_ENTRY,
+      .starting_health = DEFAULT_STARTING_HEALTH,
+      .difficulty = DEFAULT_DIFFICULTY,
   };
   return game;
 }

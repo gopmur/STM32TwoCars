@@ -41,11 +41,16 @@ void update_display() {
 }
 
 void display_thread(void* args) {
+  extern const char* GAME_DIFFICULTY_STRING[GameDifficultyCount];
+  extern const char* MAIN_MENU_ENTRY_STRINGS[GameMainMenuEntryCount];
+
   const GPIO_TypeDef* LCD_PORT = LCD_RS_GPIO_Port;
   const uint8_t WIDTH = 20;
   const uint8_t HEIGHT = 4;
   const char SELECTOR_CHAR = '>';
   const uint8_t REFRESH_PERIOD_MS = 150;
+  const char LEFT_ARROW = '<';
+  const char RIGHT_ARROW = '>';
 
   Lcd lcd =
       new_lcd((GPIO_TypeDef*)LCD_PORT, LCD_RS_Pin, LCD_RW_Pin, LCD_E_Pin,
@@ -58,18 +63,13 @@ void display_thread(void* args) {
         break;
       case GameStateMainMenu:
         lcd_print(&lcd, 0, 0, "Main Menu");
-        lcd_printf(&lcd, 0, 1, "%c Start",
-                   game.main_menu_selected_entry == GameMainMenuEntryPlay
-                       ? SELECTOR_CHAR
-                       : ' ');
-        lcd_printf(&lcd, 0, 2, "%c Settings",
-                   game.main_menu_selected_entry == GameMainMenuEntrySettings
-                       ? SELECTOR_CHAR
-                       : ' ');
-        lcd_printf(&lcd, 0, 3, "%c About",
-                   game.main_menu_selected_entry == GameMainMenuEntryAbout
-                       ? SELECTOR_CHAR
-                       : ' ');
+        for (uint8_t entry = GameMainMenuEntryStart;
+             entry < GameMainMenuEntryCount; entry++) {
+          lcd_printf(
+              &lcd, 0, entry + 1, "%c%s",
+              CHAR_IF(game.main_menu_selected_entry == entry, SELECTOR_CHAR),
+              MAIN_MENU_ENTRY_STRINGS[entry]);
+        }
         break;
       case GameStatePlaying:
         break;
@@ -77,21 +77,27 @@ void display_thread(void* args) {
         break;
       case GameStateSettings:
         lcd_print(&lcd, 0, 0, "Settings");
-        lcd_printf(&lcd, 0, 1, "%c Starting Health",
-                   game.settings_menu_selected_entry ==
-                           GameSettingsMenuEntryStartHealth
-                       ? SELECTOR_CHAR
-                       : ' ');
-        lcd_printf(&lcd, 0, 2, "%c Difficulty",
-                   game.settings_menu_selected_entry ==
-                           GameSettingsMenuEntryDifficulty
-                       ? SELECTOR_CHAR
-                       : ' ');
-        lcd_printf(&lcd, 0, 3, "%c Back",
-                   game.settings_menu_selected_entry ==
-                           GameSettingsMenuEntryBack
-                       ? SELECTOR_CHAR
-                       : ' ');
+        lcd_printf(
+            &lcd, 0, 1, "%cStarting Health %c%d%c",
+            CHAR_IF(game.settings_menu_selected_entry ==
+                        GameSettingsMenuEntryStartHealth,
+                    SELECTOR_CHAR),
+            CHAR_IF(game.starting_health != MIN_STARTING_HEALTH, LEFT_ARROW),
+            game.starting_health,
+            CHAR_IF(game.starting_health != MAX_STARTING_HEALTH, RIGHT_ARROW));
+        lcd_printf(&lcd, 0, 2, "%cDifficulty %c%s%c",
+                   CHAR_IF(game.settings_menu_selected_entry ==
+                               GameSettingsMenuEntryDifficulty,
+                           SELECTOR_CHAR),
+                   CHAR_IF(game.difficulty != GameDifficultyEasy, LEFT_ARROW),
+                   GAME_DIFFICULTY_STRING[game.difficulty],
+                   CHAR_IF(game.difficulty != GameDifficultyHard, RIGHT_ARROW));
+
+        lcd_printf(&lcd, 0, 3, "%cBack",
+                   CHAR_IF(game.settings_menu_selected_entry ==
+                               GameSettingsMenuEntryBack,
+                           SELECTOR_CHAR));
+
         break;
     }
     ulTaskNotifyTake(true, REFRESH_PERIOD_MS);
