@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "cmsis_os.h"
+
 #include "connectivity.uart.h"
 #include "helper.h"
 #include "main.h"
@@ -24,6 +26,21 @@ uint8_t uart_device_get_number(UART_HandleTypeDef* uart_device) {
   return 0;
 }
 
+void uart_rx_thread(Uart *uart) {
+  uart_start_receive(uart);
+  while (true) {
+    ulTaskNotifyTake(false, portMAX_DELAY);
+    uart_receive_completed_callback(uart);
+  }
+}
+
+void uart_tx_thread(Uart *uart) {
+  while (true) {
+    ulTaskNotifyTake(false, portMAX_DELAY);
+    uart_transmit_completed_callback(uart);
+  }
+}
+
 Uart* new_uart(UART_HandleTypeDef* uart_device,
                void (*on_receive)(char*, uint32_t)) {
   uint8_t uart_number = uart_device_get_number(uart_device);
@@ -37,10 +54,10 @@ Uart* new_uart(UART_HandleTypeDef* uart_device,
   if (uart_number != 0)
     uart_pool[uart_number - 1] = uart;
 
-  // osThreadDef(uartRxThread, uart_rx_thread, osPriorityNormal, 0, 128);
-  // uart->rx_thread = osThreadCreate(osThread(uartRxThread), uart);
-  // osThreadDef(uartTxThread, uart_tx_thread, osPriorityNormal, 0, 128);
-  // uart->tx_thread = osThreadCreate(osThread(uartTxThread), uart);
+  osThreadDef(uartRxThread, uart_rx_thread, osPriorityNormal, 0, 128);
+  uart->rx_thread = osThreadCreate(osThread(uartRxThread), uart);
+  osThreadDef(uartTxThread, uart_tx_thread, osPriorityNormal, 0, 128);
+  uart->tx_thread = osThreadCreate(osThread(uartTxThread), uart);
 
   return uart;
 }
@@ -90,7 +107,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart) {
   Uart* uart = uart_pool[uart_number - 1];
   if (uart == NULL)
     return;
-  uart_receive_completed_callback(uart);
+  vTaskNotifyGiveFromISR(uart->rx_thread, NULL);
 }
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef* huart) {
@@ -101,7 +118,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef* huart) {
   Uart* uart = uart_pool[uart_number - 1];
   if (uart == NULL)
     return;
-  uart_transmit_completed_callback(uart);
+  vTaskNotifyGiveFromISR(uart->tx_thread, NULL);
 }
 
 void uart_enqueue_message(Uart* uart, char* message, uint32_t message_length) {
