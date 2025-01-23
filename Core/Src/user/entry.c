@@ -125,6 +125,9 @@ void display_thread(void* args) {
                            SELECTOR_CHAR));
 
         break;
+      case GAME_STATE_COUNT_DOWN:
+        lcd_printf(&lcd, 0, 0, "%d", game.count_down);
+        break;
     }
     ulTaskNotifyTake(true, REFRESH_PERIOD_MS);
   }
@@ -207,10 +210,13 @@ void keypad_callback(uint8_t i, uint8_t j) {
 }
 
 void main_thread(void* arg) {
-  osDelay(500);
-  uart_sendln(uart, "main_thread");
-  // music_player_play(music_player, doom_melody, 100, true);
   while (true) {
+    switch (game.state) {
+      case GAME_STATE_COUNT_DOWN:
+        osDelay(1000);
+        game_count_down_tick((Game*)&game);
+        break;
+    }
   }
 }
 

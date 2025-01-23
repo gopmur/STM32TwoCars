@@ -21,6 +21,7 @@ Game new_game() {
       .starting_health = DEFAULT_STARTING_HEALTH,
       .difficulty = DEFAULT_DIFFICULTY,
       .player_name = NULL,
+      .count_down = GAME_COUNT_DOWN_START,
   };
   return game;
 }
@@ -31,6 +32,9 @@ void game_set_state(Game* game, GameState state) {
   }
   game->state = state;
   switch (state) {
+    case GAME_STATE_COUNT_DOWN:
+      game->count_down = GAME_COUNT_DOWN_START;
+      break;
     case GAME_STATE_MAIN_MENU:
       game->main_menu_selected_entry = GAME_MAIN_MENU_ENTRY_PLAY;
       break;
@@ -63,7 +67,7 @@ void game_main_menu_select(Game* game) {
   }
   switch (game->main_menu_selected_entry) {
     case GAME_MAIN_MENU_ENTRY_PLAY:
-      game_set_state(game, GAME_STATE_PLAYING);
+      game_set_state(game, GAME_STATE_COUNT_DOWN);
       break;
     case GAME_MAIN_MENU_ENTRY_SETTINGS:
       game_set_state(game, GAME_STATE_SETTINGS);
@@ -147,4 +151,11 @@ void game_set_player_name(Game* game, char* name) {
     free(game->player_name);
   }
   game->player_name = name;
+}
+
+void game_count_down_tick(Game *game) {
+  if (game->count_down == 0) {
+    game_set_state(game, GAME_STATE_PLAYING);
+  }
+  game->count_down--;
 }

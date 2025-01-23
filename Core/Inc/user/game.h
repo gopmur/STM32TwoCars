@@ -9,6 +9,7 @@
 #define DEFAULT_GAME_STATE GAME_STATE_FIRST_PAGE
 #define DEFAULT_STARTING_HEALTH 3
 #define DEFAULT_DIFFICULTY GAME_DIFFICULTY_NORMAL
+#define GAME_COUNT_DOWN_START 3
 
 typedef enum _GameMainMenuEntry {
   GAME_MAIN_MENU_ENTRY_PLAY,
@@ -32,6 +33,7 @@ typedef enum _GameState {
   GAME_STATE_MAIN_MENU,
   GAME_STATE_SETTINGS,
   GAME_STATE_ABOUT,
+  GAME_STATE_COUNT_DOWN,
   GAME_STATE_PLAYING,
 } GameState;
 
@@ -51,6 +53,7 @@ typedef struct _Game {
   uint8_t starting_health;
   GameDifficulty difficulty;
   uint32_t high_score;
+  uint8_t count_down;
   char* player_name;
 } Game;
 
@@ -59,11 +62,10 @@ void game_set_state(Game* game, GameState state);
 void game_main_menu_down(Game* game);
 void game_main_menu_up(Game* game);
 void game_main_menu_select(Game* game);
-
 void game_settings_menu_up(Game* game);
 void game_settings_menu_down(Game* game);
 void game_settings_menu_select(Game* game);
 void game_settings_menu_increase(Game* game);
 void game_settings_menu_decrease(Game* game);
-
 void game_set_player_name(Game* game, char* name);
+void game_count_down_tick(Game *game);
