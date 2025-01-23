@@ -66,7 +66,7 @@ void display_thread(void* args) {
                    game.main_menu_selected_entry == GameMainMenuEntrySettings
                        ? SELECTOR_CHAR
                        : ' ');
-        lcd_printf(&lcd, 0, 3, "%c Exit",
+        lcd_printf(&lcd, 0, 3, "%c About",
                    game.main_menu_selected_entry == GameMainMenuEntryAbout
                        ? SELECTOR_CHAR
                        : ' ');
@@ -139,6 +139,7 @@ void handle_settings_menu_keypad(Key key) {
     default:
       break;
   }
+  update_display();
 }
 
 void keypad_callback(uint8_t i, uint8_t j) {

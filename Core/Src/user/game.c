@@ -14,12 +14,12 @@ void game_set_state(Game* game, GameState state) {
   }
   game->state = state;
   switch (state) {
-  GameStateMainMenu:
-    game->main_menu_selected_entry = GameMainMenuEntryPlay;
-    break;
-  GameStateSettings:
-    game->settings_menu_selected_entry = GameSettingsMenuEntryStartHealth;
-    break;
+    case GameStateMainMenu:
+      game->main_menu_selected_entry = GameMainMenuEntryPlay;
+      break;
+    case GameStateSettings:
+      game->settings_menu_selected_entry = GameSettingsMenuEntryStartHealth;
+      break;
   }
 }
 
@@ -78,7 +78,7 @@ void game_settings_menu_select(Game* game) {
     return;
   }
   if (game->settings_menu_selected_entry == GameSettingsMenuEntryBack) {
-    game_set_state(game, GameStateSettings);
+    game_set_state(game, GameStateMainMenu);
   }
 }
 
