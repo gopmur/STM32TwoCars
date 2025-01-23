@@ -13,12 +13,14 @@
 #include "notes.h"
 #include "pwm.h"
 #include "seven_segment.h"
+#include "rtc.h"
 
 #include "game.h"
 #include "keymap.h"
 
 extern UART_HandleTypeDef huart1;
 extern TIM_HandleTypeDef htim2;
+extern RTC_HandleTypeDef hrtc;
 
 TIM_HandleTypeDef* buzzer_timer = &htim2;
 
@@ -49,7 +51,7 @@ void display_thread(void* args) {
   const uint8_t WIDTH = 20;
   const uint8_t HEIGHT = 4;
   const char SELECTOR_CHAR = '>';
-  const uint8_t REFRESH_PERIOD_MS = 150;
+  const uint8_t REFRESH_PERIOD_MS = 100;
   const char LEFT_ARROW = '<';
   const char RIGHT_ARROW = '>';
 
@@ -75,6 +77,8 @@ void display_thread(void* args) {
       case GameStatePlaying:
         break;
       case GameStateAbout:
+        RTC_TimeTypeDef time = rtc_get_time(&hrtc);
+        lcd_printf(&lcd, 6, 2, "%02d:%02d:%02d", time.Hours, time.Minutes, time.Seconds); 
         break;
       case GameStateSettings:
         lcd_print(&lcd, 0, 0, "Settings");
