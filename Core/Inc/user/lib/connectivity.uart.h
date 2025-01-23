@@ -1,6 +1,7 @@
 #pragma once
 
 #include "main.h"
+#include "cmsis_os.h"
 
 #define UART_RX_BUFFER_SIZE 256
 #define UART_TX_BUFFER_SIZE 256
@@ -13,6 +14,7 @@ typedef struct _Uart {
   uint8_t rx_buffer[UART_RX_BUFFER_SIZE];
   uint8_t tx_buffer[UART_TX_BUFFER_SIZE];
   uint8_t tx_queue[UART_TX_BUFFER_SIZE];
+  osThreadId on_receive_thread;
   volatile uint8_t received_byte;
   void (*on_receive)(struct _Uart* uart, char*, uint32_t);
 } Uart;

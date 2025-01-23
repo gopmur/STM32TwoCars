@@ -24,6 +24,13 @@ uint8_t uart_device_get_number(UART_HandleTypeDef* uart_device) {
   return 0;
 }
 
+void uart_on_receive(Uart* uart) {
+  while (true) {
+    ulTaskNotifyTake(true, portMAX_DELAY);
+    uart->on_receive(uart, (char*)uart->rx_buffer, uart->rx_buffer_index);
+  }
+}
+
 Uart* new_uart(UART_HandleTypeDef* uart_device,
                void (*on_receive)(Uart* uart, char*, uint32_t)) {
   uint8_t uart_number = uart_device_get_number(uart_device);
@@ -36,6 +43,9 @@ Uart* new_uart(UART_HandleTypeDef* uart_device,
   uart->on_receive = on_receive;
   if (uart_number != 0)
     uart_pool[uart_number - 1] = uart;
+
+  osThreadDef(uartOnReceiveThread, uart_on_receive, osPriorityNormal, 0, 128);
+  uart->on_receive_thread = osThreadCreate(osThread(uartOnReceiveThread), uart);
 
   uart_start_receive(uart);
 
@@ -58,16 +68,14 @@ void uart_receive_completed_callback(Uart* uart) {
   if (uart->received_byte == '\r') {
     uart->rx_buffer[uart->rx_buffer_index] = '\0';
     if (uart->on_receive) {
-      uart->on_receive(uart, (char*)uart->rx_buffer, uart->rx_buffer_index);
-      uart_send(uart, "\r");
+      vTaskNotifyGiveFromISR(uart->on_receive_thread, NULL);
     }
     uart->rx_buffer_index = 0;
-    HAL_UART_Receive_IT(uart->device, (uint8_t*)&uart->received_byte, 1);
-    return;
+  } else {
+    uart->rx_buffer[uart->rx_buffer_index] = uart->received_byte;
+    uart->rx_buffer_index++;
+    uart->rx_buffer_index %= UART_RX_BUFFER_SIZE;
   }
-  uart->rx_buffer[uart->rx_buffer_index] = uart->received_byte;
-  uart->rx_buffer_index++;
-  uart->rx_buffer_index %= UART_RX_BUFFER_SIZE;
   HAL_UART_Receive_IT(uart->device, (uint8_t*)&uart->received_byte, 1);
 }
 
