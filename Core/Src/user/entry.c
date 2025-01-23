@@ -33,11 +33,11 @@ volatile Game game;
 
 osThreadId display_thread_handle;
 
-// void message_receive_callback(Uart* uart,
-//                               char* message,
-//                               uint32_t message_length) {
-//   uart_sendln(uart, message);
-// }
+void on_receive(Uart* uart,
+                              char* message,
+                              uint32_t message_length) {
+  uart_sendln(uart, message);
+}
 
 void update_display() {
   xTaskNotifyGive(display_thread_handle);
@@ -179,7 +179,7 @@ void main_thread(void* arg) {
 }
 
 void peripheral_setup() {
-  uart = new_uart(&huart1, NULL);
+  uart = new_uart(&huart1, on_receive);
   uart_sendln(uart, "\n\n\n\nsystem start");
   new_key_pad(
       4, 4,
