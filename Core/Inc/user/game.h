@@ -50,6 +50,8 @@ typedef struct _Game {
   GameSettingsMenuEntry settings_menu_selected_entry;
   uint8_t starting_health;
   GameDifficulty difficulty;
+  uint32_t high_score;
+  char* player_name;
 } Game;
 
 Game new_game();
@@ -63,3 +65,5 @@ void game_settings_menu_down(Game* game);
 void game_settings_menu_select(Game* game);
 void game_settings_menu_increase(Game* game);
 void game_settings_menu_decrease(Game* game);
+
+void game_set_player_name(Game* game, char* name);

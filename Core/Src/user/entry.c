@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "cmsis_os.h"
 #include "entry.h"
@@ -36,7 +37,7 @@ osThreadId display_thread_handle;
 
 void on_receive(Uart* uart, char* message, uint32_t message_length) {
   ParsedMessage parsed_message = parse_message(message);
-  
+
   switch (parsed_message.type) {
     case MESSAGE_TYPE_SET_SECONDS:
       rtc_set_seconds(&hrtc, parsed_message.value.i32);
@@ -48,9 +49,9 @@ void on_receive(Uart* uart, char* message, uint32_t message_length) {
       rtc_set_hours(&hrtc, parsed_message.value.i32);
       break;
     case MESSAGE_TYPE_SET_NAME:
+      game_set_player_name(&game, parsed_message.value.char_p);
       break;
   }
-  
 }
 
 void update_display() {
@@ -92,8 +93,13 @@ void display_thread(void* args) {
         break;
       case GAME_STATE_ABOUT:
         RTC_TimeTypeDef time = rtc_get_time(&hrtc);
-        lcd_printf(&lcd, 6, 2, "%02d:%02d:%02d", time.Hours, time.Minutes,
+        lcd_printf(&lcd, 0, 2, "%02d:%02d:%02d", time.Hours, time.Minutes,
                    time.Seconds);
+        if (game.player_name) {
+          lcd_printf(&lcd, 0, 0,
+                     game.player_name);
+        }
+        lcd_printf(&lcd, 0, 1, "High Score: %d", game.high_score);
         break;
       case GAME_STATE_SETTINGS:
         lcd_print(&lcd, 0, 0, "Settings");

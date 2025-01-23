@@ -1,4 +1,5 @@
 #include "game.h"
+#include <malloc.h>
 
 const char* MAIN_MENU_ENTRY_STRINGS[GAME_MAIN_MENU_ENTRY_COUNT] = {
     "Play",
@@ -19,6 +20,7 @@ Game new_game() {
       .settings_menu_selected_entry = DEFAULT_SETTINGS_ENTRY,
       .starting_health = DEFAULT_STARTING_HEALTH,
       .difficulty = DEFAULT_DIFFICULTY,
+      .player_name = NULL,
   };
   return game;
 }
@@ -33,7 +35,8 @@ void game_set_state(Game* game, GameState state) {
       game->main_menu_selected_entry = GAME_MAIN_MENU_ENTRY_PLAY;
       break;
     case GAME_STATE_SETTINGS:
-      game->settings_menu_selected_entry = GAME_SETTINGS_MENU_ENTRY_START_HEALTH;
+      game->settings_menu_selected_entry =
+          GAME_SETTINGS_MENU_ENTRY_START_HEALTH;
       break;
   }
 }
@@ -47,7 +50,8 @@ void game_main_menu_down(Game* game) {
 }
 
 void game_main_menu_up(Game* game) {
-  if (game->main_menu_selected_entry <= 0 || game->state != GAME_STATE_MAIN_MENU) {
+  if (game->main_menu_selected_entry <= 0 ||
+      game->state != GAME_STATE_MAIN_MENU) {
     return;
   }
   game->main_menu_selected_entry--;
@@ -82,7 +86,8 @@ void game_settings_menu_up(Game* game) {
 
 void game_settings_menu_down(Game* game) {
   if (game->state != GAME_STATE_SETTINGS ||
-      game->settings_menu_selected_entry + 1 >= GAME_SETTINGS_MENU_ENTRY_COUNT) {
+      game->settings_menu_selected_entry + 1 >=
+          GAME_SETTINGS_MENU_ENTRY_COUNT) {
     return;
   }
   game->settings_menu_selected_entry++;
@@ -135,4 +140,11 @@ void game_settings_menu_decrease(Game* game) {
     default:
       break;
   }
+}
+
+void game_set_player_name(Game* game, char* name) {
+  if (game->player_name != NULL) {
+    free(game->player_name);
+  }
+  game->player_name = name;
 }
