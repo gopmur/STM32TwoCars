@@ -1,56 +1,28 @@
+#include <malloc.h>
 #include <stdio.h>
 #include <string.h>
 
 #include "message_parser.h"
 
 ParsedMessage parse_message(char* message) {
-  int32_t value;
-  uint32_t chars_read;
-  uint8_t values_matched;
-  values_matched = sscanf(message, "set_hours(%d)%n", &value, &chars_read);
-  if (values_matched == 1 && message[chars_read] == '\0') {
-    ParsedMessage parsed_message = {
-        .type = MESSAGE_TYPE_SET_HOURS,
-        .value = value,
-    };
-    return parsed_message;
+  ParsedMessage parsed_message;
+
+  if (strncmp(message, "set_seconds ", 12) == 0) {
+    parsed_message.type = MESSAGE_TYPE_SET_SECONDS;
+    sscanf(message, "set_seconds %d", &parsed_message.value.i32);
+  } else if (strncmp(message, "set_minutes ", 12) == 0) {
+    parsed_message.type = MESSAGE_TYPE_SET_MINUTES;
+    sscanf(message, "set_minutes %d", &parsed_message.value.i32);
+  } else if (strncmp(message, "set_hours ", 10) == 0) {
+    parsed_message.type = MESSAGE_TYPE_SET_HOURS;
+    sscanf(message, "set_hours %d", &parsed_message.value.i32);
+  } else if (strncmp(message, "set_name ", 9) == 0) {
+    parsed_message.type = MESSAGE_TYPE_SET_NAME;
+    parsed_message.value.char_p = malloc(sizeof(char) * (strlen(message) - 8));
+    sscanf(message, "set_name %s", parsed_message.value.char_p);
+  } else {
+    parsed_message.type = MESSAGE_TYPE_UNDEFINED;
   }
-  values_matched = sscanf(message, "set_minutes(%d)%n", &value, &chars_read);
-  if (values_matched == 1 && message[chars_read] == '\0') {
-    ParsedMessage parsed_message = {
-        .type = MESSAGE_TYPE_SET_MINUTES,
-        .value = value,
-    };
-    return parsed_message;
-  }
-  values_matched = sscanf(message, "set_seconds(%d)%n", &value, &chars_read);
-  if (values_matched == 1 && message[chars_read] == '\0') {
-    ParsedMessage parsed_message = {
-        .type = MESSAGE_TYPE_SET_SECONDS,
-        .value = value,
-    };
-    return parsed_message;
-  }
-  if (strcmp(message, "start game") == 0) {
-    ParsedMessage parse_message = {
-      .type = MESSAGE_TYPE_START_GAME,
-    };
-    return parse_message;
-  }
-  if (strcmp(message, "restart") == 0) {
-    ParsedMessage parse_message = {
-      .type = MESSAGE_TYPE_RESTART_GAME,
-    };
-    return parse_message;
-  }
-  if (strcmp(message, "menu") == 0) {
-    ParsedMessage parse_message = {
-      .type = MESSAGE_TYPE_GOTO_MAIN_MENU,
-    };
-    return parse_message;
-  }
-  ParsedMessage parsed_message = {
-      .type = MESSAGE_TYPE_UNDEFINED,
-  };
+
   return parsed_message;
 }

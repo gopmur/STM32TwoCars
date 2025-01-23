@@ -17,6 +17,7 @@
 
 #include "game.h"
 #include "keymap.h"
+#include "message_parser.h"
 
 extern UART_HandleTypeDef huart1;
 extern TIM_HandleTypeDef htim2;
@@ -34,7 +35,22 @@ volatile Game game;
 osThreadId display_thread_handle;
 
 void on_receive(Uart* uart, char* message, uint32_t message_length) {
-  uart_sendln(uart, message);
+  ParsedMessage parsed_message = parse_message(message);
+  
+  switch (parsed_message.type) {
+    case MESSAGE_TYPE_SET_SECONDS:
+      rtc_set_seconds(&hrtc, parsed_message.value.i32);
+      break;
+    case MESSAGE_TYPE_SET_MINUTES:
+      rtc_set_minutes(&hrtc, parsed_message.value.i32);
+      break;
+    case MESSAGE_TYPE_SET_HOURS:
+      rtc_set_hours(&hrtc, parsed_message.value.i32);
+      break;
+    case MESSAGE_TYPE_SET_NAME:
+      break;
+  }
+  
 }
 
 void update_display() {
@@ -42,8 +58,8 @@ void update_display() {
 }
 
 void display_thread(void* args) {
-  extern const char* GAME_DIFFICULTY_STRING[GameDifficultyCount];
-  extern const char* MAIN_MENU_ENTRY_STRINGS[GameMainMenuEntryCount];
+  extern const char* GAME_DIFFICULTY_STRING[GAME_DIFFICULTY_COUNT];
+  extern const char* MAIN_MENU_ENTRY_STRINGS[GAME_MAIN_MENU_ENTRY_COUNT];
 
   const GPIO_TypeDef* LCD_PORT = LCD_RS_GPIO_Port;
   const uint8_t WIDTH = 20;
@@ -59,47 +75,48 @@ void display_thread(void* args) {
   while (true) {
     ON_VAR_CHANGE(game.state, { lcd_clear(&lcd); });
     switch (game.state) {
-      case GameStateFirstPage:
+      case GAME_STATE_FIRST_PAGE:
         lcd_print(&lcd, 0, 0, "Two Cars");
         break;
-      case GameStateMainMenu:
+      case GAME_STATE_MAIN_MENU:
         lcd_print(&lcd, 0, 0, "Main Menu");
-        for (uint8_t entry = GameMainMenuEntryStart;
-             entry < GameMainMenuEntryCount; entry++) {
+        for (uint8_t entry = GAME_MAIN_MENU_ENTRY_START;
+             entry < GAME_MAIN_MENU_ENTRY_COUNT; entry++) {
           lcd_printf(
               &lcd, 0, entry + 1, "%c%s",
               CHAR_IF(game.main_menu_selected_entry == entry, SELECTOR_CHAR),
               MAIN_MENU_ENTRY_STRINGS[entry]);
         }
         break;
-      case GameStatePlaying:
+      case GAME_STATE_PLAYING:
         break;
-      case GameStateAbout:
+      case GAME_STATE_ABOUT:
         RTC_TimeTypeDef time = rtc_get_time(&hrtc);
         lcd_printf(&lcd, 6, 2, "%02d:%02d:%02d", time.Hours, time.Minutes,
                    time.Seconds);
         break;
-      case GameStateSettings:
+      case GAME_STATE_SETTINGS:
         lcd_print(&lcd, 0, 0, "Settings");
         lcd_printf(
             &lcd, 0, 1, "%cStarting Health %c%d%c",
             CHAR_IF(game.settings_menu_selected_entry ==
-                        GameSettingsMenuEntryStartHealth,
+                        GAME_SETTINGS_MENU_ENTRY_START_HEALTH,
                     SELECTOR_CHAR),
             CHAR_IF(game.starting_health != MIN_STARTING_HEALTH, LEFT_ARROW),
             game.starting_health,
             CHAR_IF(game.starting_health != MAX_STARTING_HEALTH, RIGHT_ARROW));
-        lcd_printf(&lcd, 0, 2, "%cDifficulty %c%-6s%c",
-                   CHAR_IF(game.settings_menu_selected_entry ==
-                               GameSettingsMenuEntryDifficulty,
-                           SELECTOR_CHAR),
-                   CHAR_IF(game.difficulty != GameDifficultyEasy, LEFT_ARROW),
-                   GAME_DIFFICULTY_STRING[game.difficulty],
-                   CHAR_IF(game.difficulty != GameDifficultyHard, RIGHT_ARROW));
+        lcd_printf(
+            &lcd, 0, 2, "%cDifficulty %c%-6s%c",
+            CHAR_IF(game.settings_menu_selected_entry ==
+                        GAME_SETTINGS_MENU_ENTRY_DIFFICULTY,
+                    SELECTOR_CHAR),
+            CHAR_IF(game.difficulty != GAME_DIFFICULTY_EASY, LEFT_ARROW),
+            GAME_DIFFICULTY_STRING[game.difficulty],
+            CHAR_IF(game.difficulty != GAME_DIFFICULTY_HARD, RIGHT_ARROW));
 
         lcd_printf(&lcd, 0, 3, "%cBack",
                    CHAR_IF(game.settings_menu_selected_entry ==
-                               GameSettingsMenuEntryBack,
+                               GAME_SETTINGS_MENU_ENTRY_BACK,
                            SELECTOR_CHAR));
 
         break;
@@ -109,7 +126,7 @@ void display_thread(void* args) {
 }
 
 void handle_first_page_keypad(Key key) {
-  game_set_state((Game*)&game, GameStateMainMenu);
+  game_set_state((Game*)&game, GAME_STATE_MAIN_MENU);
   update_display();
 }
 
@@ -147,7 +164,7 @@ void handle_settings_menu_keypad(Key key) {
       game_settings_menu_decrease((Game*)&game);
       break;
     case KeyBack:
-      game_set_state((Game*)&game, GameStateMainMenu);
+      game_set_state((Game*)&game, GAME_STATE_MAIN_MENU);
     default:
       break;
   }
@@ -157,7 +174,7 @@ void handle_settings_menu_keypad(Key key) {
 void handle_about_keypad(Key key) {
   switch (key) {
     case KeyBack:
-      game_set_state((Game*)&game, GameStateMainMenu);
+      game_set_state((Game*)&game, GAME_STATE_MAIN_MENU);
       break;
     default:
       break;
@@ -167,19 +184,19 @@ void handle_about_keypad(Key key) {
 void keypad_callback(uint8_t i, uint8_t j) {
   Key key = KEYMAP[i][j];
   switch (game.state) {
-    case GameStateFirstPage:
+    case GAME_STATE_FIRST_PAGE:
       handle_first_page_keypad(key);
       break;
-    case GameStateMainMenu:
+    case GAME_STATE_MAIN_MENU:
       handle_main_menu_keypad(key);
       break;
-    case GameStateSettings:
+    case GAME_STATE_SETTINGS:
       handle_settings_menu_keypad(key);
       break;
-    case GameStateAbout:
+    case GAME_STATE_ABOUT:
       handle_about_keypad(key);
       break;
-    case GameStatePlaying:
+    case GAME_STATE_PLAYING:
       break;
   }
 }

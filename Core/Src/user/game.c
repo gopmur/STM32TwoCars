@@ -1,12 +1,12 @@
 #include "game.h"
 
-const char* MAIN_MENU_ENTRY_STRINGS[GameMainMenuEntryCount] = {
+const char* MAIN_MENU_ENTRY_STRINGS[GAME_MAIN_MENU_ENTRY_COUNT] = {
     "Play",
     "Settings",
     "About",
 };
 
-const char* GAME_DIFFICULTY_STRING[GameDifficultyCount] = {
+const char* GAME_DIFFICULTY_STRING[GAME_DIFFICULTY_COUNT] = {
     "Easy",
     "Normal",
     "Hard",
@@ -29,43 +29,43 @@ void game_set_state(Game* game, GameState state) {
   }
   game->state = state;
   switch (state) {
-    case GameStateMainMenu:
-      game->main_menu_selected_entry = GameMainMenuEntryPlay;
+    case GAME_STATE_MAIN_MENU:
+      game->main_menu_selected_entry = GAME_MAIN_MENU_ENTRY_PLAY;
       break;
-    case GameStateSettings:
-      game->settings_menu_selected_entry = GameSettingsMenuEntryStartHealth;
+    case GAME_STATE_SETTINGS:
+      game->settings_menu_selected_entry = GAME_SETTINGS_MENU_ENTRY_START_HEALTH;
       break;
   }
 }
 
 void game_main_menu_down(Game* game) {
-  if (game->main_menu_selected_entry + 1 >= GameMainMenuEntryCount ||
-      game->state != GameStateMainMenu) {
+  if (game->main_menu_selected_entry + 1 >= GAME_MAIN_MENU_ENTRY_COUNT ||
+      game->state != GAME_STATE_MAIN_MENU) {
     return;
   }
   game->main_menu_selected_entry++;
 }
 
 void game_main_menu_up(Game* game) {
-  if (game->main_menu_selected_entry <= 0 || game->state != GameStateMainMenu) {
+  if (game->main_menu_selected_entry <= 0 || game->state != GAME_STATE_MAIN_MENU) {
     return;
   }
   game->main_menu_selected_entry--;
 }
 
 void game_main_menu_select(Game* game) {
-  if (game->state != GameStateMainMenu) {
+  if (game->state != GAME_STATE_MAIN_MENU) {
     return;
   }
   switch (game->main_menu_selected_entry) {
-    case GameMainMenuEntryPlay:
-      game_set_state(game, GameStatePlaying);
+    case GAME_MAIN_MENU_ENTRY_PLAY:
+      game_set_state(game, GAME_STATE_PLAYING);
       break;
-    case GameMainMenuEntrySettings:
-      game_set_state(game, GameStateSettings);
+    case GAME_MAIN_MENU_ENTRY_SETTINGS:
+      game_set_state(game, GAME_STATE_SETTINGS);
       break;
-    case GameMainMenuEntryAbout:
-      game_set_state(game, GameStateAbout);
+    case GAME_MAIN_MENU_ENTRY_ABOUT:
+      game_set_state(game, GAME_STATE_ABOUT);
       break;
     default:
       break;
@@ -73,7 +73,7 @@ void game_main_menu_select(Game* game) {
 }
 
 void game_settings_menu_up(Game* game) {
-  if (game->state != GameStateSettings ||
+  if (game->state != GAME_STATE_SETTINGS ||
       game->settings_menu_selected_entry <= 0) {
     return;
   }
@@ -81,34 +81,34 @@ void game_settings_menu_up(Game* game) {
 }
 
 void game_settings_menu_down(Game* game) {
-  if (game->state != GameStateSettings ||
-      game->settings_menu_selected_entry + 1 >= GameSettingsMenuEntryCount) {
+  if (game->state != GAME_STATE_SETTINGS ||
+      game->settings_menu_selected_entry + 1 >= GAME_SETTINGS_MENU_ENTRY_COUNT) {
     return;
   }
   game->settings_menu_selected_entry++;
 }
 
 void game_settings_menu_select(Game* game) {
-  if (game->state != GameStateSettings) {
+  if (game->state != GAME_STATE_SETTINGS) {
     return;
   }
-  if (game->settings_menu_selected_entry == GameSettingsMenuEntryBack) {
-    game_set_state(game, GameStateMainMenu);
+  if (game->settings_menu_selected_entry == GAME_SETTINGS_MENU_ENTRY_BACK) {
+    game_set_state(game, GAME_STATE_MAIN_MENU);
   }
 }
 
 void game_settings_menu_increase(Game* game) {
-  if (game->state != GameStateSettings) {
+  if (game->state != GAME_STATE_SETTINGS) {
     return;
   }
   switch (game->settings_menu_selected_entry) {
-    case GameSettingsMenuEntryStartHealth:
+    case GAME_SETTINGS_MENU_ENTRY_START_HEALTH:
       if (game->starting_health < MAX_STARTING_HEALTH) {
         game->starting_health++;
       }
       break;
-    case GameSettingsMenuEntryDifficulty:
-      if (game->difficulty < GameDifficultyHard) {
+    case GAME_SETTINGS_MENU_ENTRY_DIFFICULTY:
+      if (game->difficulty < GAME_DIFFICULTY_HARD) {
         game->difficulty++;
       }
       break;
@@ -118,16 +118,16 @@ void game_settings_menu_increase(Game* game) {
 }
 
 void game_settings_menu_decrease(Game* game) {
-  if (game->state != GameStateSettings) {
+  if (game->state != GAME_STATE_SETTINGS) {
     return;
   }
   switch (game->settings_menu_selected_entry) {
-    case GameSettingsMenuEntryStartHealth:
+    case GAME_SETTINGS_MENU_ENTRY_START_HEALTH:
       if (game->starting_health > 0) {
         game->starting_health--;
       }
       break;
-    case GameSettingsMenuEntryDifficulty:
+    case GAME_SETTINGS_MENU_ENTRY_DIFFICULTY:
       if (game->difficulty > 0) {
         game->difficulty--;
       }

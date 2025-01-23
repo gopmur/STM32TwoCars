@@ -4,45 +4,45 @@
 
 #define MIN_STARTING_HEALTH 3
 #define MAX_STARTING_HEALTH 5
-#define DEFAULT_SETTINGS_ENTRY GameSettingsMenuEntryStartHealth
-#define DEFAULT_MAIN_MENU_ENTRY GameMainMenuEntryPlay
-#define DEFAULT_GAME_STATE GameStateFirstPage
+#define DEFAULT_SETTINGS_ENTRY GAME_SETTINGS_MENU_ENTRY_START_HEALTH
+#define DEFAULT_MAIN_MENU_ENTRY GAME_MAIN_MENU_ENTRY_PLAY
+#define DEFAULT_GAME_STATE GAME_STATE_FIRST_PAGE
 #define DEFAULT_STARTING_HEALTH 3
-#define DEFAULT_DIFFICULTY GameDifficultyNormal
+#define DEFAULT_DIFFICULTY GAME_DIFFICULTY_NORMAL
 
 typedef enum _GameMainMenuEntry {
-  GameMainMenuEntryPlay,
-  GameMainMenuEntrySettings,
-  GameMainMenuEntryAbout,
-  GameMainMenuEntryCount,
-  GameMainMenuEntryStart = GameMainMenuEntryPlay,
+  GAME_MAIN_MENU_ENTRY_PLAY,
+  GAME_MAIN_MENU_ENTRY_SETTINGS,
+  GAME_MAIN_MENU_ENTRY_ABOUT,
+  GAME_MAIN_MENU_ENTRY_COUNT,
+  GAME_MAIN_MENU_ENTRY_START = GAME_MAIN_MENU_ENTRY_PLAY,
 } GameMainMenuEntry;
 
-extern const char* MAIN_MENU_ENTRY_STRINGS[GameMainMenuEntryCount];
+extern const char* MAIN_MENU_ENTRY_STRINGS[GAME_MAIN_MENU_ENTRY_COUNT];
 
 typedef enum _GameSettingsMenuEntry {
-  GameSettingsMenuEntryStartHealth,
-  GameSettingsMenuEntryDifficulty,
-  GameSettingsMenuEntryBack,
-  GameSettingsMenuEntryCount,
+  GAME_SETTINGS_MENU_ENTRY_START_HEALTH,
+  GAME_SETTINGS_MENU_ENTRY_DIFFICULTY,
+  GAME_SETTINGS_MENU_ENTRY_BACK,
+  GAME_SETTINGS_MENU_ENTRY_COUNT,
 } GameSettingsMenuEntry;
 
 typedef enum _GameState {
-  GameStateFirstPage,
-  GameStateMainMenu,
-  GameStateSettings,
-  GameStateAbout,
-  GameStatePlaying,
+  GAME_STATE_FIRST_PAGE,
+  GAME_STATE_MAIN_MENU,
+  GAME_STATE_SETTINGS,
+  GAME_STATE_ABOUT,
+  GAME_STATE_PLAYING,
 } GameState;
 
 typedef enum _GameDifficulty {
-  GameDifficultyEasy,
-  GameDifficultyNormal,
-  GameDifficultyHard,
-  GameDifficultyCount,
+  GAME_DIFFICULTY_EASY,
+  GAME_DIFFICULTY_NORMAL,
+  GAME_DIFFICULTY_HARD,
+  GAME_DIFFICULTY_COUNT,
 } GameDifficulty;
 
-extern const char* GAME_DIFFICULTY_STRING[GameDifficultyCount];
+extern const char* GAME_DIFFICULTY_STRING[GAME_DIFFICULTY_COUNT];
 
 typedef struct _Game {
   GameState state;
