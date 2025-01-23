@@ -97,6 +97,42 @@ void game_settings_menu_select(Game* game) {
   }
 }
 
-void game_settings_menu_increase(Game* game) {}
+void game_settings_menu_increase(Game* game) {
+  if (game->state != GameStateSettings) {
+    return;
+  }
+  switch (game->settings_menu_selected_entry) {
+    case GameSettingsMenuEntryStartHealth:
+      if (game->starting_health < MAX_STARTING_HEALTH) {
+        game->starting_health++;
+      }
+      break;
+    case GameSettingsMenuEntryDifficulty:
+      if (game->difficulty < GameDifficultyHard) {
+        game->difficulty++;
+      }
+      break;
+    default:
+      break;
+  }
+}
 
-void game_settings_menu_decrease(Game* game) {}
+void game_settings_menu_decrease(Game* game) {
+  if (game->state != GameStateSettings) {
+    return;
+  }
+  switch (game->settings_menu_selected_entry) {
+    case GameSettingsMenuEntryStartHealth:
+      if (game->starting_health > 0) {
+        game->starting_health--;
+      }
+      break;
+    case GameSettingsMenuEntryDifficulty:
+      if (game->difficulty > 0) {
+        game->difficulty--;
+      }
+      break;
+    default:
+      break;
+  }
+}

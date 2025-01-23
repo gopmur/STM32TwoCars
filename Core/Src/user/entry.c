@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <stdio.h>
 
 #include "cmsis_os.h"
 #include "entry.h"
@@ -85,13 +86,16 @@ void display_thread(void* args) {
             CHAR_IF(game.starting_health != MIN_STARTING_HEALTH, LEFT_ARROW),
             game.starting_health,
             CHAR_IF(game.starting_health != MAX_STARTING_HEALTH, RIGHT_ARROW));
-        lcd_printf(&lcd, 0, 2, "%cDifficulty %c%s%c",
+        char print_buffer[9];
+        snprintf(print_buffer, 9, "%c%s%c",
+                 CHAR_IF(game.difficulty != GameDifficultyEasy, LEFT_ARROW),
+                 GAME_DIFFICULTY_STRING[game.difficulty],
+                 CHAR_IF(game.difficulty != GameDifficultyHard, RIGHT_ARROW));
+        lcd_printf(&lcd, 0, 2, "%cDifficulty %8s",
                    CHAR_IF(game.settings_menu_selected_entry ==
                                GameSettingsMenuEntryDifficulty,
                            SELECTOR_CHAR),
-                   CHAR_IF(game.difficulty != GameDifficultyEasy, LEFT_ARROW),
-                   GAME_DIFFICULTY_STRING[game.difficulty],
-                   CHAR_IF(game.difficulty != GameDifficultyHard, RIGHT_ARROW));
+                   print_buffer);
 
         lcd_printf(&lcd, 0, 3, "%cBack",
                    CHAR_IF(game.settings_menu_selected_entry ==
