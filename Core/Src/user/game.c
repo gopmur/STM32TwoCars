@@ -128,7 +128,7 @@ void game_settings_menu_decrease(Game* game) {
   }
   switch (game->settings_menu_selected_entry) {
     case GAME_SETTINGS_MENU_ENTRY_START_HEALTH:
-      if (game->starting_health > 0) {
+      if (game->starting_health > MIN_STARTING_HEALTH) {
         game->starting_health--;
       }
       break;

@@ -96,8 +96,7 @@ void display_thread(void* args) {
         lcd_printf(&lcd, 0, 2, "%02d:%02d:%02d", time.Hours, time.Minutes,
                    time.Seconds);
         if (game.player_name) {
-          lcd_printf(&lcd, 0, 0,
-                     game.player_name);
+          lcd_printf(&lcd, 0, 0, "%-20s", game.player_name);
         }
         lcd_printf(&lcd, 0, 1, "High Score: %d", game.high_score);
         break;
