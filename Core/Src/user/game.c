@@ -22,6 +22,8 @@ Game new_game() {
       .difficulty = DEFAULT_DIFFICULTY,
       .player_name = NULL,
       .count_down = GAME_COUNT_DOWN_START,
+      .cars_position[DIRECTION_LEFT] = DIRECTION_RIGHT,
+      .cars_position[DIRECTION_RIGHT] = DIRECTION_LEFT,
   };
   return game;
 }
@@ -41,6 +43,10 @@ void game_set_state(Game* game, GameState state) {
     case GAME_STATE_SETTINGS:
       game->settings_menu_selected_entry =
           GAME_SETTINGS_MENU_ENTRY_START_HEALTH;
+      break;
+    case GAME_STATE_PLAYING:
+      game->cars_position[DIRECTION_LEFT] = DIRECTION_RIGHT;
+      game->cars_position[DIRECTION_RIGHT] = DIRECTION_LEFT;
       break;
   }
 }
@@ -153,9 +159,11 @@ void game_set_player_name(Game* game, char* name) {
   game->player_name = name;
 }
 
-void game_count_down_tick(Game *game) {
+void game_count_down_tick(Game* game) {
   if (game->count_down == 0) {
     game_set_state(game, GAME_STATE_PLAYING);
   }
   game->count_down--;
 }
+
+void game_cars_forward(Game* game) {}

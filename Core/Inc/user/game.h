@@ -46,6 +46,11 @@ typedef enum _GameDifficulty {
 
 extern const char* GAME_DIFFICULTY_STRING[GAME_DIFFICULTY_COUNT];
 
+typedef enum _Direction {
+  DIRECTION_RIGHT,
+  DIRECTION_LEFT,
+} Direction;
+
 typedef struct _Game {
   GameState state;
   GameMainMenuEntry main_menu_selected_entry;
@@ -55,6 +60,7 @@ typedef struct _Game {
   uint32_t high_score;
   uint8_t count_down;
   char* player_name;
+  Direction cars_position[2];
 } Game;
 
 Game new_game();
@@ -69,3 +75,4 @@ void game_settings_menu_increase(Game* game);
 void game_settings_menu_decrease(Game* game);
 void game_set_player_name(Game* game, char* name);
 void game_count_down_tick(Game *game);
+void game_cars_forward(Game* game);

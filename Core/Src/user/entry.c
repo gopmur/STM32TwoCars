@@ -89,8 +89,6 @@ void display_thread(void* args) {
               MAIN_MENU_ENTRY_STRINGS[entry]);
         }
         break;
-      case GAME_STATE_PLAYING:
-        break;
       case GAME_STATE_ABOUT:
         RTC_TimeTypeDef time = rtc_get_time(&hrtc);
         lcd_printf(&lcd, 0, 2, "%02d:%02d:%02d", time.Hours, time.Minutes,
@@ -128,6 +126,12 @@ void display_thread(void* args) {
       case GAME_STATE_COUNT_DOWN:
         lcd_printf(&lcd, 0, 0, "%d", game.count_down);
         break;
+      case GAME_STATE_PLAYING:
+        lcd_write(&lcd, WIDTH - 1, game.cars_position[DIRECTION_RIGHT], 'A');
+        lcd_write(&lcd, WIDTH - 1, !game.cars_position[DIRECTION_RIGHT], ' ');
+        lcd_write(&lcd, WIDTH - 1, 2 + game.cars_position[DIRECTION_LEFT], 'A');
+        lcd_write(&lcd, WIDTH - 1, 2 + !game.cars_position[DIRECTION_LEFT],
+                  ' ');
     }
     ulTaskNotifyTake(true, REFRESH_PERIOD_MS);
   }
@@ -216,11 +220,15 @@ void main_thread(void* arg) {
         osDelay(1000);
         game_count_down_tick((Game*)&game);
         break;
+      case GAME_STATE_PLAYING:
+        osDelay(100);
+        game_cars_forward((Game*)&game);
+        break;
     }
   }
 }
 
-void peripheral_setup() {
+void setup() {
   uart = new_uart(&huart1, on_receive);
   uart_sendln(uart, "\n\n\n\nsystem start");
   new_key_pad(
@@ -264,29 +272,11 @@ void peripheral_setup() {
           SVN_SEG_BCD3_GPIO_Port,
           SVN_SEG_BCD4_GPIO_Port,
       });
-}
-
-void os_setup() {
   osThreadDef(mainThread, main_thread, osPriorityNormal, 0, 128 * 1);
-  osThreadId main_thread_handle = osThreadCreate(osThread(mainThread), NULL);
-  if (main_thread_handle == NULL) {
-    // uart_sendln(uart, "log: main thread did not start successfully");
-  } else {
-    // uart_sendln(uart, "log: main thread started successfully");
-  }
+  osThreadCreate(osThread(mainThread), NULL);
 
   osThreadDef(displayThread, display_thread, osPriorityNormal, 0, 128 * 2);
   display_thread_handle = osThreadCreate(osThread(displayThread), NULL);
-  if (display_thread_handle == NULL) {
-    // uart_sendln(uart, "log: display thread did not start successfully");
-  } else {
-    // uart_sendln(uart, "log: display thread started successfully");
-  }
-}
-
-void setup() {
-  peripheral_setup();
-  os_setup();
 
   game = new_game();
 }
