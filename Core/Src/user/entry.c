@@ -14,6 +14,7 @@
 #include "seven_segment.h"
 
 #include "game.h"
+#include "keymap.h"
 
 extern UART_HandleTypeDef huart1;
 extern TIM_HandleTypeDef htim2;
@@ -36,13 +37,15 @@ void message_receive_callback(Uart* uart,
 }
 
 void update_display() {
-  osThreadResume(display_thread_handle);
+  xTaskNotifyGive(display_thread_handle);
 }
 
 void display_thread(void* args) {
   const GPIO_TypeDef* LCD_PORT = LCD_RS_GPIO_Port;
   const uint8_t WIDTH = 20;
   const uint8_t HEIGHT = 4;
+  const char SELECTOR_CHAR = '>';
+  const uint8_t REFRESH_PERIOD_MS = 150;
 
   Lcd lcd =
       new_lcd((GPIO_TypeDef*)LCD_PORT, LCD_RS_Pin, LCD_RW_Pin, LCD_E_Pin,
@@ -55,24 +58,100 @@ void display_thread(void* args) {
         break;
       case GameStateMainMenu:
         lcd_print(&lcd, 0, 0, "Main Menu");
-        lcd_printf(&lcd, 0, 1, "%c Start", '>');
-        lcd_printf(&lcd, 0, 2, "%c Settings", ' ');
-        lcd_printf(&lcd, 0, 3, "%c Exit", ' ');
+        lcd_printf(&lcd, 0, 1, "%c Start",
+                   game.main_menu_selected_entry == GameMainMenuEntryPlay
+                       ? SELECTOR_CHAR
+                       : ' ');
+        lcd_printf(&lcd, 0, 2, "%c Settings",
+                   game.main_menu_selected_entry == GameMainMenuEntrySettings
+                       ? SELECTOR_CHAR
+                       : ' ');
+        lcd_printf(&lcd, 0, 3, "%c Exit",
+                   game.main_menu_selected_entry == GameMainMenuEntryAbout
+                       ? SELECTOR_CHAR
+                       : ' ');
         break;
       case GameStatePlaying:
         break;
+      case GameStateAbout:
+        break;
+      case GameStateSettings:
+        lcd_print(&lcd, 0, 0, "Settings");
+        lcd_printf(&lcd, 0, 1, "%c Starting Health",
+                   game.settings_menu_selected_entry ==
+                           GameSettingsMenuEntryStartHealth
+                       ? SELECTOR_CHAR
+                       : ' ');
+        lcd_printf(&lcd, 0, 2, "%c Difficulty",
+                   game.settings_menu_selected_entry ==
+                           GameSettingsMenuEntryDifficulty
+                       ? SELECTOR_CHAR
+                       : ' ');
+        lcd_printf(&lcd, 0, 3, "%c Back",
+                   game.settings_menu_selected_entry ==
+                           GameSettingsMenuEntryBack
+                       ? SELECTOR_CHAR
+                       : ' ');
+        break;
     }
-    osThreadSuspend(NULL);
+    ulTaskNotifyTake(true, REFRESH_PERIOD_MS);
+  }
+}
+
+void handle_first_page_keypad(Key key) {
+  game_set_state((Game*)&game, GameStateMainMenu);
+  update_display();
+}
+
+void handle_main_menu_keypad(Key key) {
+  switch (key) {
+    case KeyUp:
+      game_main_menu_up((Game*)&game);
+      break;
+    case KeyDown:
+      game_main_menu_down((Game*)&game);
+      break;
+    default:
+    case KeySelect:
+      game_main_menu_select((Game*)&game);
+      break;
+  }
+  update_display();
+}
+
+void handle_settings_menu_keypad(Key key) {
+  switch (key) {
+    case KeyUp:
+      game_settings_menu_up((Game*)&game);
+      break;
+    case KeyDown:
+      game_settings_menu_down((Game*)&game);
+      break;
+    case KeySelect:
+      game_settings_menu_select((Game*)&game);
+      break;
+    case KeyRight:
+      game_settings_menu_increase((Game*)&game);
+      break;
+    case KeyLeft:
+      game_settings_menu_decrease((Game*)&game);
+      break;
+    default:
+      break;
   }
 }
 
 void keypad_callback(uint8_t i, uint8_t j) {
+  Key key = KEYMAP[i][j];
   switch (game.state) {
     case GameStateFirstPage:
-      game_set_state(&game, GameStateMainMenu);
-      update_display();
+      handle_first_page_keypad(key);
       break;
     case GameStateMainMenu:
+      handle_main_menu_keypad(key);
+      break;
+    case GameStateSettings:
+      handle_settings_menu_keypad(key);
       break;
     case GameStatePlaying:
       break;
