@@ -19,7 +19,8 @@ typedef enum _Key {
   KeyRight = Key6,
   KeyDown = Key8,
   KeyLeft = Key4,
-  KeySelect = Key5
+  KeySelect = Key5,
+  KeyBack = KeyD,
 } Key;
 
 const Key KEYMAP[4][4] = {{Key1, Key2, Key3, KeyA},

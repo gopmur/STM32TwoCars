@@ -12,8 +12,8 @@
 #include "music_player.h"
 #include "notes.h"
 #include "pwm.h"
-#include "seven_segment.h"
 #include "rtc.h"
+#include "seven_segment.h"
 
 #include "game.h"
 #include "keymap.h"
@@ -33,9 +33,7 @@ volatile Game game;
 
 osThreadId display_thread_handle;
 
-void on_receive(Uart* uart,
-                              char* message,
-                              uint32_t message_length) {
+void on_receive(Uart* uart, char* message, uint32_t message_length) {
   uart_sendln(uart, message);
 }
 
@@ -78,7 +76,8 @@ void display_thread(void* args) {
         break;
       case GameStateAbout:
         RTC_TimeTypeDef time = rtc_get_time(&hrtc);
-        lcd_printf(&lcd, 6, 2, "%02d:%02d:%02d", time.Hours, time.Minutes, time.Seconds); 
+        lcd_printf(&lcd, 6, 2, "%02d:%02d:%02d", time.Hours, time.Minutes,
+                   time.Seconds);
         break;
       case GameStateSettings:
         lcd_print(&lcd, 0, 0, "Settings");
@@ -147,10 +146,22 @@ void handle_settings_menu_keypad(Key key) {
     case KeyLeft:
       game_settings_menu_decrease((Game*)&game);
       break;
+    case KeyBack:
+      game_set_state((Game*)&game, GameStateMainMenu);
     default:
       break;
   }
   update_display();
+}
+
+void handle_about_keypad(Key key) {
+  switch (key) {
+    case KeyBack:
+      game_set_state((Game*)&game, GameStateMainMenu);
+      break;
+    default:
+      break;
+  }
 }
 
 void keypad_callback(uint8_t i, uint8_t j) {
@@ -164,6 +175,9 @@ void keypad_callback(uint8_t i, uint8_t j) {
       break;
     case GameStateSettings:
       handle_settings_menu_keypad(key);
+      break;
+    case GameStateAbout:
+      handle_about_keypad(key);
       break;
     case GameStatePlaying:
       break;
