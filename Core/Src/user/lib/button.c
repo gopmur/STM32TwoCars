@@ -38,7 +38,7 @@ Button* new_button(GPIO_TypeDef* port,
                    uint32_t on_press_arg_size) {
   EXEC_ONCE({
     osThreadDef(ButtonInterruptThread, button_interrupt_thread, osPriorityNormal, 0,
-                128 * 4);
+                128);
     button_interrupt_thread_handle =
         osThreadCreate(osThread(ButtonInterruptThread), NULL);
     if (button_interrupt_thread_handle == NULL) {

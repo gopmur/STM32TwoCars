@@ -36,7 +36,7 @@ SevenSegment* new_seven_segment(uint16_t digit_pins[4],
     seven_segment->decimal_points[i] = false;
   }
   osThreadDef(sevenSegmentThread, seven_segment_thread, osPriorityNormal, 0,
-              128 * 4);
+              128);
   osThreadCreate(osThread(sevenSegmentThread), seven_segment);
   return seven_segment;
 }
