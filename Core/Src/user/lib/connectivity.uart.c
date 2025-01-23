@@ -44,7 +44,7 @@ Uart* new_uart(UART_HandleTypeDef* uart_device,
   if (uart_number != 0)
     uart_pool[uart_number - 1] = uart;
 
-  osThreadDef(uartOnReceiveThread, uart_on_receive, osPriorityNormal, 0, 128);
+  osThreadDef(uartOnReceiveThread, uart_on_receive, osPriorityNormal, 0, 128 * 2);
   uart->on_receive_thread = osThreadCreate(osThread(uartOnReceiveThread), uart);
 
   uart_start_receive(uart);
