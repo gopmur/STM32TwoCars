@@ -193,6 +193,18 @@ void handle_about_keypad(Key key) {
   }
 }
 
+void handle_playing_keypad(Key key) {
+  switch (key) {
+    case KeyLeft:
+      game_left_car_turn((Game*)&game);
+      break;
+    case KeyRight:
+      game_right_car_turn((Game*)&game);
+      break;
+  }
+  update_display();
+}
+
 void keypad_callback(uint8_t i, uint8_t j) {
   Key key = KEYMAP[i][j];
   switch (game.state) {
@@ -209,6 +221,7 @@ void keypad_callback(uint8_t i, uint8_t j) {
       handle_about_keypad(key);
       break;
     case GAME_STATE_PLAYING:
+      handle_playing_keypad(key);
       break;
   }
 }

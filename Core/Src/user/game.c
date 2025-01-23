@@ -167,3 +167,16 @@ void game_count_down_tick(Game* game) {
 }
 
 void game_cars_forward(Game* game) {}
+
+void game_left_car_turn(Game* game) {
+  if (game->state != GAME_STATE_PLAYING) {
+    return;
+  }
+  game->cars_position[DIRECTION_LEFT] = !game->cars_position[DIRECTION_LEFT];
+}
+void game_right_car_turn(Game* game) {
+  if (game->state != GAME_STATE_PLAYING) {
+    return;
+  }
+  game->cars_position[DIRECTION_RIGHT] = !game->cars_position[DIRECTION_RIGHT];
+}

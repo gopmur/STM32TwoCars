@@ -74,5 +74,7 @@ void game_settings_menu_select(Game* game);
 void game_settings_menu_increase(Game* game);
 void game_settings_menu_decrease(Game* game);
 void game_set_player_name(Game* game, char* name);
-void game_count_down_tick(Game *game);
+void game_count_down_tick(Game* game);
 void game_cars_forward(Game* game);
+void game_left_car_turn(Game* game);
+void game_right_car_turn(Game* game);
