@@ -4,11 +4,8 @@
 #include "cmsis_os.h"
 
 #include "button.h"
-#include "connectivity.uart.h"
 #include "helper.h"
 #include "virt_timer.h"
-
-extern Uart* uart;
 
 Button* button_pool[PHYSICAL_BUTTON_COUNT] = {NULL};
 ButtonInterruptHandler button_interrupt_handler;
@@ -41,12 +38,6 @@ Button* new_button(GPIO_TypeDef* port,
                 128 * 1);
     button_interrupt_thread_handle =
         osThreadCreate(osThread(ButtonInterruptThread), NULL);
-    if (button_interrupt_thread_handle == NULL) {
-      uart_sendln(uart,
-                  "log: button_interrupt thread did not start successfully");
-    } else {
-      uart_sendln(uart, "log: button_interrupt thread started successfully");
-    }
   })
 
   uint8_t pin_number = get_pin_number(pin);

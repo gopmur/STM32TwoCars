@@ -33,11 +33,11 @@ volatile Game game;
 
 osThreadId display_thread_handle;
 
-void message_receive_callback(Uart* uart,
-                              char* message,
-                              uint32_t message_length) {
-  uart_sendln(uart, message);
-}
+// void message_receive_callback(Uart* uart,
+//                               char* message,
+//                               uint32_t message_length) {
+//   uart_sendln(uart, message);
+// }
 
 void update_display() {
   xTaskNotifyGive(display_thread_handle);
@@ -172,7 +172,7 @@ void keypad_callback(uint8_t i, uint8_t j) {
 
 void main_thread(void* arg) {
   osDelay(500);
-  // uart_sendln(uart, "main_thread");
+  uart_sendln(uart, "main_thread");
   // music_player_play(music_player, doom_melody, 100, true);
   while (true) {
   }
@@ -228,17 +228,17 @@ void os_setup() {
   osThreadDef(mainThread, main_thread, osPriorityNormal, 0, 128 * 1);
   osThreadId main_thread_handle = osThreadCreate(osThread(mainThread), NULL);
   if (main_thread_handle == NULL) {
-    uart_sendln(uart, "log: main thread did not start successfully");
+    // uart_sendln(uart, "log: main thread did not start successfully");
   } else {
-    uart_sendln(uart, "log: main thread started successfully");
+    // uart_sendln(uart, "log: main thread started successfully");
   }
 
   osThreadDef(displayThread, display_thread, osPriorityNormal, 0, 128 * 2);
   display_thread_handle = osThreadCreate(osThread(displayThread), NULL);
   if (display_thread_handle == NULL) {
-    uart_sendln(uart, "log: display thread did not start successfully");
+    // uart_sendln(uart, "log: display thread did not start successfully");
   } else {
-    uart_sendln(uart, "log: display thread started successfully");
+    // uart_sendln(uart, "log: display thread started successfully");
   }
 }
 
