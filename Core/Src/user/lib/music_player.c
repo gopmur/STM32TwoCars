@@ -108,6 +108,10 @@ void music_player_resume(MusicPlayer* music_player) {
   xQueueSend(music_player->command_queue, &command, 0);
 }
 
+void music_player_set_tempo(MusicPlayer *music_player, int16_t tempo) {
+  music_player->tempo = tempo;
+}
+
 // void music_player_play_melody_it(MusicPlayer* music_player,
 //                                  int16_t* melody,
 //                                  float volume,

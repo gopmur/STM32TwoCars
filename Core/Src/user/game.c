@@ -297,6 +297,9 @@ void game_update_points(Game* game) {
     game->road[LCD_WIDTH - 1][game->cars_position[DIRECTION_RIGHT]] =
         SHAPE_EMPTY;
   }
+  const int16_t BASE_TEMPO = doom_melody[0];
+  int16_t tempo = BASE_TEMPO + MIN(game->points, MAX_TEMPO_SCORES) * (MAX_TEMPO - BASE_TEMPO) / MAX_TEMPO_SCORES;
+  music_player_set_tempo(music_player, tempo);
 }
 
 void game_cars_forward(Game* game) {
