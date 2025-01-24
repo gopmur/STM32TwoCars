@@ -49,7 +49,7 @@ void on_receive(Uart* uart, char* message, uint32_t message_length) {
       rtc_set_hours(&hrtc, parsed_message.value.i32);
       break;
     case MESSAGE_TYPE_SET_NAME:
-      game_set_player_name(&game, parsed_message.value.char_p);
+      game_set_player_name((Game*)&game, parsed_message.value.char_p);
       break;
   }
 }
@@ -63,8 +63,8 @@ void display_thread(void* args) {
   extern const char* MAIN_MENU_ENTRY_STRINGS[GAME_MAIN_MENU_ENTRY_COUNT];
 
   const GPIO_TypeDef* LCD_PORT = LCD_RS_GPIO_Port;
-  const uint8_t WIDTH = 20;
-  const uint8_t HEIGHT = 4;
+  const uint8_t WIDTH = LCD_WIDTH;
+  const uint8_t HEIGHT = LCD_HEIGHT;
   const char SELECTOR_CHAR = '>';
   const uint8_t REFRESH_PERIOD_MS = 100;
   const char LEFT_ARROW = '<';
@@ -132,6 +132,15 @@ void display_thread(void* args) {
         lcd_write(&lcd, WIDTH - 1, 2 + game.cars_position[DIRECTION_LEFT], 'A');
         lcd_write(&lcd, WIDTH - 1, 2 + !game.cars_position[DIRECTION_LEFT],
                   ' ');
+        for (uint8_t i = 0; i < LCD_WIDTH; i++) {
+          for (uint8_t j = 0; j < LCD_HEIGHT; j++) {
+            lcd_write(&lcd, i, j,
+                      game.road[i][j] == SHAPE_CIRCLE   ? '0'
+                      : game.road[i][j] == SHAPE_SQUARE ? '*'
+                                                        : ' ');
+          }
+        }
+        break;
     }
     ulTaskNotifyTake(true, REFRESH_PERIOD_MS);
   }
@@ -234,7 +243,7 @@ void main_thread(void* arg) {
         game_count_down_tick((Game*)&game);
         break;
       case GAME_STATE_PLAYING:
-        osDelay(100);
+        osDelay(500);
         game_cars_forward((Game*)&game);
         break;
     }
@@ -285,7 +294,7 @@ void setup() {
           SVN_SEG_BCD3_GPIO_Port,
           SVN_SEG_BCD4_GPIO_Port,
       });
-  osThreadDef(mainThread, main_thread, osPriorityNormal, 0, 128 * 1);
+  osThreadDef(mainThread, main_thread, osPriorityNormal, 0, 128 * 2);
   osThreadCreate(osThread(mainThread), NULL);
 
   osThreadDef(displayThread, display_thread, osPriorityNormal, 0, 128 * 2);

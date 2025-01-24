@@ -1,5 +1,9 @@
-#include "game.h"
 #include <malloc.h>
+#include <stdlib.h>
+
+#include "entry.h"
+
+#include "game.h"
 
 const char* MAIN_MENU_ENTRY_STRINGS[GAME_MAIN_MENU_ENTRY_COUNT] = {
     "Play",
@@ -25,6 +29,11 @@ Game new_game() {
       .cars_position[DIRECTION_LEFT] = DIRECTION_RIGHT,
       .cars_position[DIRECTION_RIGHT] = DIRECTION_LEFT,
   };
+  for (uint8_t i = 0; i < LCD_WIDTH; i++) {
+    for (uint8_t j = 0; j < LCD_HEIGHT; j++) {
+      game.road[i][j] = SHAPE_EMPTY;
+    }
+  }
   return game;
 }
 
@@ -166,7 +175,22 @@ void game_count_down_tick(Game* game) {
   game->count_down--;
 }
 
-void game_cars_forward(Game* game) {}
+void shift_road(Game* game) {
+  for (uint8_t i = LCD_WIDTH - 1; i > 0; i--) {
+    for (uint8_t j = 0; j < LCD_HEIGHT; j++) {
+      game->road[i][j] = game->road[i - 1][j];
+    }
+  }
+  for (uint8_t j = 0; j < LCD_HEIGHT; j++) {
+    game->road[0][j] = SHAPE_EMPTY;
+  }
+}
+
+void game_cars_forward(Game* game) {
+  shift_road(game);
+  Direction side = rand() % 2;
+  game->road[0][side] = SHAPE_CIRCLE;
+}
 
 void game_left_car_turn(Game* game) {
   if (game->state != GAME_STATE_PLAYING) {

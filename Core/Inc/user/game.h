@@ -51,6 +51,12 @@ typedef enum _Direction {
   DIRECTION_LEFT,
 } Direction;
 
+typedef enum _Shape {
+  SHAPE_CIRCLE,
+  SHAPE_SQUARE,
+  SHAPE_EMPTY,
+} Shape;
+
 typedef struct _Game {
   GameState state;
   GameMainMenuEntry main_menu_selected_entry;
@@ -61,6 +67,7 @@ typedef struct _Game {
   uint8_t count_down;
   char* player_name;
   Direction cars_position[2];
+  Shape road[LCD_WIDTH][LCD_HEIGHT];
 } Game;
 
 Game new_game();
