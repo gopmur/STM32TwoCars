@@ -192,8 +192,27 @@ void shift_road(Game* game) {
   }
 }
 
-void game_cars_forward(Game* game) {
-  shift_road(game);
+void game_generate_shape_left(Game* game) {
+  static uint8_t distance_to_last_generation = 0;
+  bool generate_circle = rand() > 3 * (float)RAND_MAX / (game->difficulty + 4);
+  bool generate_square = rand() > 3 * (float)RAND_MAX / (game->difficulty + 4);
+  if (distance_to_last_generation <
+      MIN_DISTANCE_BETWEEN_GENERATIONS +
+          (GAME_DIFFICULTY_COUNT - game->difficulty)) {
+    distance_to_last_generation++;
+    return;
+  }
+  distance_to_last_generation = 0;
+  Direction side = rand() % 2;
+  if (generate_circle) {
+    game->road[0][side + 2] = SHAPE_CIRCLE;
+  }
+  if (generate_square) {
+    game->road[0][!side + 2] = SHAPE_SQUARE;
+  }
+}
+
+void game_generate_shape_right(Game* game) {
   static uint8_t distance_to_last_generation = 0;
   bool generate_circle = rand() > 3 * (float)RAND_MAX / (game->difficulty + 4);
   bool generate_square = rand() > 3 * (float)RAND_MAX / (game->difficulty + 4);
@@ -211,6 +230,12 @@ void game_cars_forward(Game* game) {
   if (generate_square) {
     game->road[0][!side] = SHAPE_SQUARE;
   }
+}
+
+void game_cars_forward(Game* game) {
+  shift_road(game);
+  game_generate_shape_left(game);
+  game_generate_shape_right(game);
 }
 
 void game_left_car_turn(Game* game) {
