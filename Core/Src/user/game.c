@@ -2,6 +2,9 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include "music_player.h"
+#include "notes.h"
+
 #include "entry.h"
 
 #include "game.h"
@@ -48,6 +51,15 @@ void game_set_state(Game* game, GameState state) {
   if (game->state == state) {
     return;
   }
+
+  if (state == GAME_STATE_PLAYING) {
+    music_player_play(music_player, doom_melody, 100, true);
+  }
+
+  else {
+    music_player_stop(music_player);
+  }
+
   game->state = state;
   switch (state) {
     case GAME_STATE_COUNT_DOWN:
