@@ -22,6 +22,11 @@ const char* GAME_DIFFICULTY_STRING[GAME_DIFFICULTY_COUNT] = {
     "Hard",
 };
 
+const char* GAME_OVER_ENTRY_STRINGS[GAME_OVER_ENTRY_COUNT] = {
+    "Rstart",
+    "Exit",
+};
+
 void game_clear_road(Game* game) {
   for (uint8_t i = 0; i < LCD_WIDTH; i++) {
     for (uint8_t j = 0; j < LCD_HEIGHT; j++) {
@@ -317,4 +322,30 @@ void game_right_car_turn(Game* game) {
     return;
   }
   game->cars_position[DIRECTION_RIGHT] = !game->cars_position[DIRECTION_RIGHT];
+}
+
+void game_over_up(Game* game) {
+  if (game->game_over_selected_entry <= 0 ||
+      game->state != GAME_STATE_GAME_OVER) {
+    return;
+  }
+  game->game_over_selected_entry--;
+}
+void game_over_down(Game* game) {
+  if (game->game_over_selected_entry + 1 >= GAME_OVER_ENTRY_COUNT ||
+      game->state != GAME_STATE_GAME_OVER) {
+    return;
+  }
+  game->game_over_selected_entry++;
+}
+
+void game_over_select(Game* game) {
+  switch (game->game_over_selected_entry) {
+    case GAME_OVER_ENTRY_EXIT:
+      game_set_state(game, GAME_STATE_MAIN_MENU);
+      break;
+    case GAME_OVER_ENTRY_RESTART:
+      game_set_state(game, GAME_STATE_COUNT_DOWN);
+      break;
+  }
 }

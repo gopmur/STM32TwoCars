@@ -179,6 +179,13 @@ void display_thread(void* args) {
       case GAME_STATE_GAME_OVER:
         lcd_print(&lcd, 0, 0, "Game Over!");
         lcd_printf(&lcd, 0, 1, "Score: %d", game.points);
+        for (uint8_t entry = 0, i = 2; entry < GAME_OVER_ENTRY_COUNT;
+             entry++, i++) {
+          lcd_printf(
+              &lcd, 0, i, "%c%s",
+              CHAR_IF(game.game_over_selected_entry == entry, SELECTOR_CHAR),
+              GAME_OVER_ENTRY_STRINGS[entry]);
+        }
         break;
     }
     ulTaskNotifyTake(true, REFRESH_PERIOD_MS);
@@ -260,6 +267,15 @@ void handle_game_over_keypad(Key key) {
   switch (key) {
     case KeyBack:
       game_set_state((Game*)&game, GAME_STATE_MAIN_MENU);
+      break;
+    case KeyUp:
+      game_over_up((Game*)&game);
+      break;
+    case KeyDown:
+      game_over_down((Game*)&game);
+      break;
+    case KeySelect:
+      game_over_select((Game*)&game);
       break;
     default:
       break;

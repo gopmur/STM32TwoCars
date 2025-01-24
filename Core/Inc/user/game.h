@@ -29,6 +29,14 @@ typedef enum _GameSettingsMenuEntry {
   GAME_SETTINGS_MENU_ENTRY_COUNT,
 } GameSettingsMenuEntry;
 
+typedef enum _GameOverEntry {
+  GAME_OVER_ENTRY_RESTART,
+  GAME_OVER_ENTRY_EXIT,
+  GAME_OVER_ENTRY_COUNT,
+} GameOverEntry;
+
+extern const char* GAME_OVER_ENTRY_STRINGS[GAME_OVER_ENTRY_COUNT];
+
 typedef enum _GameState {
   GAME_STATE_FIRST_PAGE,
   GAME_STATE_MAIN_MENU,
@@ -63,6 +71,7 @@ typedef struct _Game {
   GameState state;
   GameMainMenuEntry main_menu_selected_entry;
   GameSettingsMenuEntry settings_menu_selected_entry;
+  GameOverEntry game_over_selected_entry;
   uint8_t starting_health;
   GameDifficulty difficulty;
   uint16_t high_score;
@@ -84,6 +93,9 @@ void game_settings_menu_down(Game* game);
 void game_settings_menu_select(Game* game);
 void game_settings_menu_increase(Game* game);
 void game_settings_menu_decrease(Game* game);
+void game_over_up(Game* game);
+void game_over_down(Game *game);
+void game_over_select(Game *game);
 void game_set_player_name(Game* game, char* name);
 void game_count_down_tick(Game* game);
 void game_cars_forward(Game* game);
