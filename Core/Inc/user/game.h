@@ -6,6 +6,7 @@
 #define MAX_STARTING_HEALTH 5
 #define DEFAULT_SETTINGS_ENTRY GAME_SETTINGS_MENU_ENTRY_START_HEALTH
 #define DEFAULT_MAIN_MENU_ENTRY GAME_MAIN_MENU_ENTRY_PLAY
+#define DEFAULT_GAME_OVER_ENTRY GAME_OVER_ENTRY_RESTART
 #define DEFAULT_GAME_STATE GAME_STATE_FIRST_PAGE
 #define DEFAULT_STARTING_HEALTH 3
 #define DEFAULT_DIFFICULTY GAME_DIFFICULTY_NORMAL
@@ -94,8 +95,8 @@ void game_settings_menu_select(Game* game);
 void game_settings_menu_increase(Game* game);
 void game_settings_menu_decrease(Game* game);
 void game_over_up(Game* game);
-void game_over_down(Game *game);
-void game_over_select(Game *game);
+void game_over_down(Game* game);
+void game_over_select(Game* game);
 void game_set_player_name(Game* game, char* name);
 void game_count_down_tick(Game* game);
 void game_cars_forward(Game* game);

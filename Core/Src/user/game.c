@@ -40,6 +40,7 @@ Game new_game() {
       .state = DEFAULT_GAME_STATE,
       .main_menu_selected_entry = DEFAULT_MAIN_MENU_ENTRY,
       .settings_menu_selected_entry = DEFAULT_SETTINGS_ENTRY,
+      .game_over_selected_entry = DEFAULT_GAME_OVER_ENTRY,
       .starting_health = DEFAULT_STARTING_HEALTH,
       .difficulty = DEFAULT_DIFFICULTY,
       .player_name = NULL,
@@ -84,6 +85,9 @@ void game_set_state(Game* game, GameState state) {
       game->health = game->starting_health;
       game->points = 0;
       game_clear_road(game);
+      break;
+    case GAME_STATE_GAME_OVER:
+      game->game_over_selected_entry = GAME_OVER_ENTRY_RESTART;
       break;
   }
 }
