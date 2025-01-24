@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "LiquidCrystal.h"
+
 #include "cmsis_os.h"
 #include "entry.h"
 #include "main.h"
@@ -128,6 +130,7 @@ void display_thread(void* args) {
         break;
       case GAME_STATE_PLAYING:
         lcd_write(&lcd, WIDTH - 1, game.cars_position[DIRECTION_RIGHT], 'A');
+        
         lcd_write(
             &lcd, WIDTH - 1, !game.cars_position[DIRECTION_RIGHT],
             game.road[LCD_WIDTH - 1][!game.cars_position[DIRECTION_RIGHT]] ==
@@ -138,6 +141,7 @@ void display_thread(void* args) {
                 ? '*'
                 : ' ');
         lcd_write(&lcd, WIDTH - 1, 2 + game.cars_position[DIRECTION_LEFT], 'A');
+        
         lcd_write(
             &lcd, WIDTH - 1, 2 + !game.cars_position[DIRECTION_LEFT],
             game.road[LCD_WIDTH - 1][2 + !game.cars_position[DIRECTION_LEFT]] ==
@@ -149,7 +153,7 @@ void display_thread(void* args) {
                 : ' ');
         for (uint8_t i = 0; i < LCD_WIDTH - 1; i++) {
           for (uint8_t j = 0; j < LCD_HEIGHT; j++) {
-            lcd_write(&lcd, i, j,
+              lcd_write(&lcd, i, j,
                       game.road[i][j] == SHAPE_CIRCLE   ? '0'
                       : game.road[i][j] == SHAPE_SQUARE ? '*'
                                                         : ' ');

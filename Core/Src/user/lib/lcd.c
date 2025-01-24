@@ -1,8 +1,8 @@
 #include <malloc.h>
-#include <stdbool.h>
-#include <string.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "LiquidCrystal.h"
 
@@ -61,6 +61,8 @@ void lcd_clear(Lcd* lcd) {
       current_display[i][j] = ' ';
     }
   }
+  lcd->cursor_x = 0;
+  lcd->cursor_y = 0;
   clear();
 }
 
@@ -69,9 +71,16 @@ void inc_cursor(uint8_t* x, uint8_t* y) {
   uint8_t y_val = *y;
   x_val++;
   if (x_val >= LCD_WIDTH) {
-    x_val = 0;
-    y_val += 2;
-    y_val %= LCD_HEIGHT;
+    switch (y_val) {
+      case 0:
+      case 1:
+        y_val += 2;
+      case 2:
+        y_val--;
+        break;
+      case 3:
+        y_val -= 3;
+    }
   }
   *x = x_val;
   *y = y_val;
