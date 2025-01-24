@@ -236,8 +236,32 @@ void game_generate_shape_right(Game* game) {
   }
 }
 
+void game_update_health(Game* game) {
+  if (game->road[LCD_WIDTH - 1][game->cars_position[DIRECTION_LEFT] + 2] == SHAPE_SQUARE) {
+    game->health--;
+    game->road[LCD_WIDTH - 1][game->cars_position[DIRECTION_LEFT] + 2] = SHAPE_EMPTY;
+  }
+  if (game->road[LCD_WIDTH - 1][game->cars_position[DIRECTION_RIGHT]] == SHAPE_SQUARE) {
+    game->health--;
+    game->road[LCD_WIDTH - 1][game->cars_position[DIRECTION_RIGHT]] = SHAPE_EMPTY;
+  }
+}
+
+void game_update_points(Game* game) {
+  if (game->road[LCD_WIDTH - 1][game->cars_position[DIRECTION_LEFT] + 2] == SHAPE_CIRCLE) {
+    game->points++;
+    game->road[LCD_WIDTH - 1][game->cars_position[DIRECTION_LEFT] + 2] = SHAPE_EMPTY;
+  }
+  if (game->road[LCD_WIDTH - 1][game->cars_position[DIRECTION_RIGHT]] == SHAPE_CIRCLE) {
+    game->points++;
+    game->road[LCD_WIDTH - 1][game->cars_position[DIRECTION_RIGHT]] = SHAPE_EMPTY;
+  }
+}
+
 void game_cars_forward(Game* game) {
   shift_road(game);
+  game_update_health(game);
+  game_update_points(game);
   game_generate_shape_left(game);
   game_generate_shape_right(game);
 }
