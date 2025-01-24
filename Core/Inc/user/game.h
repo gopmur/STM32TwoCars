@@ -36,6 +36,7 @@ typedef enum _GameState {
   GAME_STATE_ABOUT,
   GAME_STATE_COUNT_DOWN,
   GAME_STATE_PLAYING,
+  GAME_STATE_GAME_OVER,
 } GameState;
 
 typedef enum _GameDifficulty {
@@ -64,12 +65,12 @@ typedef struct _Game {
   GameSettingsMenuEntry settings_menu_selected_entry;
   uint8_t starting_health;
   GameDifficulty difficulty;
-  uint32_t high_score;
+  uint16_t high_score;
   uint8_t count_down;
   char* player_name;
   Direction cars_position[2];
   Shape road[LCD_WIDTH][LCD_HEIGHT];
-  uint8_t health;
+  int8_t health;
   uint16_t points;
 } Game;
 

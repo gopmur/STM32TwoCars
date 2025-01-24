@@ -176,6 +176,10 @@ void display_thread(void* args) {
           }
         }
         break;
+      case GAME_STATE_GAME_OVER:
+        lcd_print(&lcd, 0, 0, "Game Over!");
+        lcd_printf(&lcd, 0, 1, "Score: %d", game.points);
+        break;
     }
     ulTaskNotifyTake(true, REFRESH_PERIOD_MS);
   }
@@ -252,6 +256,17 @@ void handle_playing_keypad(Key key) {
   update_display();
 }
 
+void handle_game_over_keypad(Key key) {
+  switch (key) {
+    case KeyBack:
+      game_set_state((Game*)&game, GAME_STATE_MAIN_MENU);
+      break;
+    default:
+      break;
+  }
+  update_display();
+}
+
 void keypad_callback(uint8_t i, uint8_t j) {
   Key key = KEYMAP[i][j];
   switch (game.state) {
@@ -269,6 +284,9 @@ void keypad_callback(uint8_t i, uint8_t j) {
       break;
     case GAME_STATE_PLAYING:
       handle_playing_keypad(key);
+      break;
+    case GAME_STATE_GAME_OVER:
+      handle_game_over_keypad(key);
       break;
   }
 }

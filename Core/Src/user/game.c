@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include "helper.h"
 #include "music_player.h"
 #include "notes.h"
 
@@ -294,6 +295,13 @@ void game_cars_forward(Game* game) {
   shift_road(game);
   game_update_health_square(game);
   game_update_points(game);
+
+  if (game->health < 0) {
+    game_set_state(game, GAME_STATE_GAME_OVER);
+    game->high_score = MAX(game->high_score, game->points);
+    return;
+  }
+
   game_generate_shape_left(game);
   game_generate_shape_right(game);
 }
