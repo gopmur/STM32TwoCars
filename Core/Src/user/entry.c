@@ -37,6 +37,17 @@ volatile Game game;
 
 osThreadId display_thread_handle;
 
+void seven_segment_set_health(SevenSegment* seven_segment, uint8_t health) {
+  seven_segment->digits[0] = health;
+}
+
+void seven_segment_set_points(SevenSegment* seven_segment, uint8_t points) {
+  for (uint8_t i = 1; i < 4; i++) {
+    seven_segment->digits[i] = points % 10;
+    points /= 10;
+  }
+}
+
 void on_receive(Uart* uart, char* message, uint32_t message_length) {
   ParsedMessage parsed_message = parse_message(message);
 
@@ -76,7 +87,10 @@ void display_thread(void* args) {
       new_lcd((GPIO_TypeDef*)LCD_PORT, LCD_RS_Pin, LCD_RW_Pin, LCD_E_Pin,
               LCD_D4_Pin, LCD_D5_Pin, LCD_D6_Pin, LCD_D7_Pin, WIDTH, HEIGHT);
   while (true) {
-    ON_VAR_CHANGE(game.state, { lcd_clear(&lcd); });
+    ON_VAR_CHANGE(game.state, {
+      lcd_clear(&lcd);
+      seven_segment_disable_all_digits(seven_segment);
+    });
     switch (game.state) {
       case GAME_STATE_FIRST_PAGE:
         lcd_print(&lcd, 0, 0, "Two Cars");
@@ -129,6 +143,8 @@ void display_thread(void* args) {
         lcd_printf(&lcd, 0, 0, "%d", game.count_down);
         break;
       case GAME_STATE_PLAYING:
+        seven_segment_set_health(seven_segment, game.health);
+        seven_segment_set_points(seven_segment, game.points);
         lcd_write(&lcd, WIDTH - 1, game.cars_position[DIRECTION_RIGHT], 'A');
 
         lcd_write(

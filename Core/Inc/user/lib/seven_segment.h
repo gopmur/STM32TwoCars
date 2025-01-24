@@ -32,3 +32,4 @@ void seven_segment_set_digit(SevenSegment* seven_segment,
                              uint8_t digit_index);
 void seven_segment_disable_digit(SevenSegment* seven_segment,
                                  uint8_t digit_index);
+void seven_segment_disable_all_digits(SevenSegment* seven_segment);

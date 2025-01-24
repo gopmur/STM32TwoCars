@@ -37,6 +37,8 @@ Game new_game() {
       .count_down = GAME_COUNT_DOWN_START,
       .cars_position[DIRECTION_LEFT] = DIRECTION_RIGHT,
       .cars_position[DIRECTION_RIGHT] = DIRECTION_LEFT,
+      .health = DEFAULT_STARTING_HEALTH,
+      .points = 0,
   };
   game_clear_road(&game);
   return game;
@@ -61,6 +63,8 @@ void game_set_state(Game* game, GameState state) {
     case GAME_STATE_PLAYING:
       game->cars_position[DIRECTION_LEFT] = DIRECTION_RIGHT;
       game->cars_position[DIRECTION_RIGHT] = DIRECTION_LEFT;
+      game->health = game->starting_health;
+      game->points = 0;
       game_clear_road(game);
       break;
   }

@@ -69,6 +69,8 @@ typedef struct _Game {
   char* player_name;
   Direction cars_position[2];
   Shape road[LCD_WIDTH][LCD_HEIGHT];
+  uint8_t health;
+  uint16_t points;
 } Game;
 
 Game new_game();

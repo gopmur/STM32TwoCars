@@ -116,3 +116,9 @@ void seven_segment_disable_digit(SevenSegment* seven_segment,
     return;
   seven_segment->digits[digit_index] = SEVEN_SEGMENT_DISABLED_DIGIT;
 }
+
+void seven_segment_disable_all_digits(SevenSegment* seven_segment) {
+  for (uint8_t i = 0; i < 4; i++) {
+    seven_segment_disable_digit(seven_segment, i);
+  }
+}
