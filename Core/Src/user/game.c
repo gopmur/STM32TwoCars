@@ -1,6 +1,6 @@
 #include <malloc.h>
-#include <stdlib.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 #include "entry.h"
 
@@ -18,6 +18,14 @@ const char* GAME_DIFFICULTY_STRING[GAME_DIFFICULTY_COUNT] = {
     "Hard",
 };
 
+void game_clear_road(Game* game) {
+  for (uint8_t i = 0; i < LCD_WIDTH; i++) {
+    for (uint8_t j = 0; j < LCD_HEIGHT; j++) {
+      game->road[i][j] = SHAPE_EMPTY;
+    }
+  }
+}
+
 Game new_game() {
   Game game = {
       .state = DEFAULT_GAME_STATE,
@@ -30,11 +38,7 @@ Game new_game() {
       .cars_position[DIRECTION_LEFT] = DIRECTION_RIGHT,
       .cars_position[DIRECTION_RIGHT] = DIRECTION_LEFT,
   };
-  for (uint8_t i = 0; i < LCD_WIDTH; i++) {
-    for (uint8_t j = 0; j < LCD_HEIGHT; j++) {
-      game.road[i][j] = SHAPE_EMPTY;
-    }
-  }
+  game_clear_road(&game);
   return game;
 }
 
@@ -57,6 +61,7 @@ void game_set_state(Game* game, GameState state) {
     case GAME_STATE_PLAYING:
       game->cars_position[DIRECTION_LEFT] = DIRECTION_RIGHT;
       game->cars_position[DIRECTION_RIGHT] = DIRECTION_LEFT;
+      game_clear_road(game);
       break;
   }
 }
@@ -190,14 +195,22 @@ void shift_road(Game* game) {
 void game_cars_forward(Game* game) {
   shift_road(game);
   static uint8_t distance_to_last_generation = 0;
-  bool generate = rand() < RAND_MAX / 3;
-  if (!generate || distance_to_last_generation < MIN_DISTANCE_BETWEEN_GENERATIONS) {
+  bool generate_circle = rand() > 3 * (float)RAND_MAX / (game->difficulty + 4);
+  bool generate_square = rand() > 3 * (float)RAND_MAX / (game->difficulty + 4);
+  if (distance_to_last_generation <
+      MIN_DISTANCE_BETWEEN_GENERATIONS +
+          (GAME_DIFFICULTY_COUNT - game->difficulty)) {
     distance_to_last_generation++;
     return;
   }
   distance_to_last_generation = 0;
   Direction side = rand() % 2;
-  game->road[0][side] = SHAPE_CIRCLE;
+  if (generate_circle) {
+    game->road[0][side] = SHAPE_CIRCLE;
+  }
+  if (generate_square) {
+    game->road[0][!side] = SHAPE_SQUARE;
+  }
 }
 
 void game_left_car_turn(Game* game) {

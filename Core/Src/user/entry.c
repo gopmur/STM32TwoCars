@@ -225,6 +225,8 @@ void handle_playing_keypad(Key key) {
     case KeyRight:
       game_right_car_turn((Game*)&game);
       break;
+    case KeyBack:
+      game_set_state((Game*)&game, GAME_STATE_MAIN_MENU);
   }
   update_display();
 }
