@@ -378,5 +378,7 @@ void setup() {
   osThreadDef(displayThread, display_thread, osPriorityNormal, 0, 128 * 2);
   display_thread_handle = osThreadCreate(osThread(displayThread), NULL);
 
+  init_sine_wave();
+
   game = new_game();
 }
