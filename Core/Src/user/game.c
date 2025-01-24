@@ -1,5 +1,6 @@
 #include <malloc.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "entry.h"
 
@@ -188,6 +189,13 @@ void shift_road(Game* game) {
 
 void game_cars_forward(Game* game) {
   shift_road(game);
+  static uint8_t distance_to_last_generation = 0;
+  bool generate = rand() < RAND_MAX / 3;
+  if (!generate || distance_to_last_generation < MIN_DISTANCE_BETWEEN_GENERATIONS) {
+    distance_to_last_generation++;
+    return;
+  }
+  distance_to_last_generation = 0;
   Direction side = rand() % 2;
   game->road[0][side] = SHAPE_CIRCLE;
 }
