@@ -64,6 +64,9 @@ void on_receive(Uart* uart, char* message, uint32_t message_length) {
     case MESSAGE_TYPE_SET_NAME:
       game_set_player_name((Game*)&game, parsed_message.value.char_p);
       break;
+    case MESSAGE_TYPE_TIME_SYN:
+      rtc_syn(&hrtc, parsed_message.value.time_syn_data);
+      break;
   }
 }
 
@@ -107,6 +110,9 @@ void display_thread(void* args) {
         break;
       case GAME_STATE_ABOUT:
         RTC_TimeTypeDef time = rtc_get_time(&hrtc);
+        RTC_DateTypeDef date = rtc_get_date(&hrtc);
+        lcd_printf(&lcd, 0, 3, "20%02d/%02d/%02d", date.Year, date.Month,
+                   date.Date);
         lcd_printf(&lcd, 0, 2, "%02d:%02d:%02d", time.Hours, time.Minutes,
                    time.Seconds);
         if (game.player_name) {

@@ -20,6 +20,15 @@ ParsedMessage parse_message(char* message) {
     parsed_message.type = MESSAGE_TYPE_SET_NAME;
     parsed_message.value.char_p = malloc(sizeof(char) * (strlen(message) - 8));
     sscanf(message, "set_name %s", parsed_message.value.char_p);
+  } else if (strncmp(message, "time_syn ", 9) == 0) {
+    parsed_message.type = MESSAGE_TYPE_TIME_SYN;
+    sscanf(message, "time_syn %d/%d/%d,%d:%d:%d",
+           &parsed_message.value.time_syn_data.year,
+           &parsed_message.value.time_syn_data.month,
+           &parsed_message.value.time_syn_data.day,
+           &parsed_message.value.time_syn_data.hour,
+           &parsed_message.value.time_syn_data.minute,
+           &parsed_message.value.time_syn_data.second);
   } else {
     parsed_message.type = MESSAGE_TYPE_UNDEFINED;
   }
