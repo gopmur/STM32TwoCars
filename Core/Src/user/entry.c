@@ -1,7 +1,7 @@
 #include <stdbool.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "LiquidCrystal.h"
 
@@ -301,6 +301,26 @@ void handle_settings_menu_keypad(Key key) {
   update_display();
 }
 
+void key_seq_get_char(Key key, char* entered_char, bool* next) {
+  static uint32_t last_tick = 0;
+  static Key last_key;
+  static uint8_t seq = 0;
+
+  uint32_t current_tick = HAL_GetTick();
+  if (current_tick - last_tick > 1000 || last_key != key) {
+    seq = 0;
+    *next = true;
+  } else {
+    if (seq < strlen(KEY_SEQ[key]) - 1) {
+      seq++;
+    }
+    *next = false;
+  }
+  *entered_char = KEY_SEQ[key][seq];
+  last_key = key;
+  last_tick = current_tick;
+}
+
 void handle_about_keypad(Key key) {
   switch (key) {
     case KeyBack:
@@ -309,6 +329,10 @@ void handle_about_keypad(Key key) {
     case KeyDel:
       game_delete_from_name((Game*)&game);
     default:
+      char entered_char;
+      bool next;
+      key_seq_get_char(key, &entered_char, &next);
+      uart_sendf(uart, "key: %c\n", entered_char);
       break;
   }
 }
