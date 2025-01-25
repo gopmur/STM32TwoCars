@@ -91,6 +91,8 @@ void display_thread(void* args) {
       new_lcd((GPIO_TypeDef*)LCD_PORT, LCD_RS_Pin, LCD_RW_Pin, LCD_E_Pin,
               LCD_D4_Pin, LCD_D5_Pin, LCD_D6_Pin, LCD_D7_Pin, WIDTH, HEIGHT);
   init_custom_chars();
+  lcd_clear(&lcd);
+  // osDelay(10);
   while (true) {
     ON_VAR_CHANGE(game.state, {
       lcd_clear(&lcd);
@@ -165,20 +167,20 @@ void display_thread(void* args) {
             &lcd, WIDTH - 1, !game.cars_position[DIRECTION_RIGHT],
             game.road[LCD_WIDTH - 1][!game.cars_position[DIRECTION_RIGHT]] ==
                     SHAPE_CIRCLE
-                ? '0'
+                ? CHAR_CIRCLE
             : game.road[LCD_WIDTH - 1][!game.cars_position[DIRECTION_RIGHT]] ==
                     SHAPE_SQUARE
-                ? '*'
+                ? CHAR_SQUARE
                 : ' ');
 
         lcd_write(
             &lcd, WIDTH - 2, !game.cars_position[DIRECTION_RIGHT],
             game.road[LCD_WIDTH - 2][!game.cars_position[DIRECTION_RIGHT]] ==
                     SHAPE_CIRCLE
-                ? '0'
+                ? CHAR_CIRCLE
             : game.road[LCD_WIDTH - 2][!game.cars_position[DIRECTION_RIGHT]] ==
                     SHAPE_SQUARE
-                ? '*'
+                ? CHAR_SQUARE
                 : ' ');
         lcd_write(&lcd, WIDTH - 1, 2 + game.cars_position[DIRECTION_LEFT],
                   CHAR_CAR_BACK);
@@ -189,25 +191,25 @@ void display_thread(void* args) {
             &lcd, WIDTH - 1, 2 + !game.cars_position[DIRECTION_LEFT],
             game.road[LCD_WIDTH - 1][2 + !game.cars_position[DIRECTION_LEFT]] ==
                     SHAPE_CIRCLE
-                ? '0'
+                ? CHAR_CIRCLE
             : game.road[LCD_WIDTH - 1]
                        [2 + !game.cars_position[DIRECTION_LEFT]] == SHAPE_SQUARE
-                ? '*'
+                ? CHAR_SQUARE
                 : ' ');
         lcd_write(
             &lcd, WIDTH - 2, 2 + !game.cars_position[DIRECTION_LEFT],
             game.road[LCD_WIDTH - 2][2 + !game.cars_position[DIRECTION_LEFT]] ==
                     SHAPE_CIRCLE
-                ? '0'
+                ? CHAR_CIRCLE
             : game.road[LCD_WIDTH - 2]
                        [2 + !game.cars_position[DIRECTION_LEFT]] == SHAPE_SQUARE
-                ? '*'
+                ? CHAR_SQUARE
                 : ' ');
         for (uint8_t i = 0; i < LCD_WIDTH - 2; i++) {
           for (uint8_t j = 0; j < LCD_HEIGHT; j++) {
             lcd_write(&lcd, i, j,
-                      game.road[i][j] == SHAPE_CIRCLE   ? '0'
-                      : game.road[i][j] == SHAPE_SQUARE ? '*'
+                      game.road[i][j] == SHAPE_CIRCLE   ? CHAR_CIRCLE
+                      : game.road[i][j] == SHAPE_SQUARE ? CHAR_SQUARE
                                                         : ' ');
           }
         }
