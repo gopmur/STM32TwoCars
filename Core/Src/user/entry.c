@@ -332,7 +332,7 @@ void handle_about_keypad(Key key) {
       char entered_char;
       bool next;
       key_seq_get_char(key, &entered_char, &next);
-      uart_sendf(uart, "key: %c\n", entered_char);
+      game_add_to_name((Game*)&game, entered_char, next);
       break;
   }
 }

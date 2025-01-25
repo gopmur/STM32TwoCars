@@ -119,3 +119,4 @@ void game_set_speed(Game* game, uint16_t speed);
 void game_set_melody(Game* game, uint8_t melody);
 void game_shift_and_generate_road(Game* game);
 void game_delete_from_name(Game* game);
+void game_add_to_name(Game* game, char character, bool next);

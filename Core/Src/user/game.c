@@ -446,3 +446,20 @@ void game_delete_from_name(Game* game) {
   }
   game->player_name[name_length - 1] = '\0';
 }
+
+void game_add_to_name(Game* game, char character, bool next) {
+  if (game->state != GAME_STATE_ABOUT || character == '\0') {
+    return;
+  }
+  uint8_t name_length = strlen(game->player_name);
+  if (name_length == PLAYER_MAX_NAME_LENGTH) {
+    return;
+  }
+  if (next) {
+    game->player_name[name_length] = character;
+    game->player_name[name_length + 1] = '\0';
+  }
+  else {
+    game->player_name[name_length - 1] = character;
+  }
+} 
