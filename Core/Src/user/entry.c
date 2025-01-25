@@ -139,11 +139,14 @@ void display_thread(void* args) {
             GAME_DIFFICULTY_STRING[game.difficulty],
             CHAR_IF(game.difficulty != GAME_DIFFICULTY_HARD, RIGHT_ARROW));
 
-        lcd_printf(&lcd, 0, 3, "%cBack",
-                   CHAR_IF(game.settings_menu_selected_entry ==
-                               GAME_SETTINGS_MENU_ENTRY_BACK,
-                           SELECTOR_CHAR));
-
+        lcd_printf(
+            &lcd, 0, 3, "%cSpeed %c%-2d%c",
+            CHAR_IF(game.settings_menu_selected_entry ==
+                        GAME_SETTINGS_MENU_ENTRY_SPEED,
+                    SELECTOR_CHAR),
+            CHAR_IF(game.speed > GAME_MIN_SPEED_BLOCK_PER_S, LEFT_ARROW),
+            game.speed,
+            CHAR_IF(game.speed < GAME_MAX_SPEED_BLOCK_PER_S, RIGHT_ARROW));
         break;
       case GAME_STATE_COUNT_DOWN:
         lcd_printf(&lcd, 0, 0, "%d", game.count_down);
@@ -227,9 +230,6 @@ void handle_settings_menu_keypad(Key key) {
       break;
     case KeyDown:
       game_settings_menu_down((Game*)&game);
-      break;
-    case KeySelect:
-      game_settings_menu_select((Game*)&game);
       break;
     case KeyRight:
       game_settings_menu_increase((Game*)&game);

@@ -49,6 +49,7 @@ Game new_game() {
       .cars_position[DIRECTION_RIGHT] = DIRECTION_LEFT,
       .health = DEFAULT_STARTING_HEALTH,
       .points = 0,
+      .speed = GAME_MIN_SPEED_BLOCK_PER_S,
   };
   game_clear_road(&game);
   return game;
@@ -144,15 +145,6 @@ void game_settings_menu_down(Game* game) {
   game->settings_menu_selected_entry++;
 }
 
-void game_settings_menu_select(Game* game) {
-  if (game->state != GAME_STATE_SETTINGS) {
-    return;
-  }
-  if (game->settings_menu_selected_entry == GAME_SETTINGS_MENU_ENTRY_BACK) {
-    game_set_state(game, GAME_STATE_MAIN_MENU);
-  }
-}
-
 void game_settings_menu_increase(Game* game) {
   if (game->state != GAME_STATE_SETTINGS) {
     return;
@@ -166,6 +158,11 @@ void game_settings_menu_increase(Game* game) {
     case GAME_SETTINGS_MENU_ENTRY_DIFFICULTY:
       if (game->difficulty < GAME_DIFFICULTY_HARD) {
         game->difficulty++;
+      }
+      break;
+    case GAME_SETTINGS_MENU_ENTRY_SPEED:
+      if (game->speed + GAME_SPEED_STEP <= GAME_MAX_SPEED_BLOCK_PER_S) {
+        game->speed += GAME_SPEED_STEP;
       }
       break;
     default:
@@ -186,6 +183,11 @@ void game_settings_menu_decrease(Game* game) {
     case GAME_SETTINGS_MENU_ENTRY_DIFFICULTY:
       if (game->difficulty > 0) {
         game->difficulty--;
+      }
+      break;
+    case GAME_SETTINGS_MENU_ENTRY_SPEED:
+      if ((int16_t)game->speed - GAME_SPEED_STEP >= GAME_MIN_SPEED_BLOCK_PER_S) {
+        game->speed -= GAME_SPEED_STEP;
       }
       break;
     default:

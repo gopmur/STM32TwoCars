@@ -14,6 +14,9 @@
 #define MIN_DISTANCE_BETWEEN_GENERATIONS 2
 #define MAX_TEMPO 90
 #define MAX_TEMPO_SCORES 100
+#define GAME_MAX_SPEED_BLOCK_PER_S 30
+#define GAME_MIN_SPEED_BLOCK_PER_S 5
+#define GAME_SPEED_STEP 5
 
 typedef enum _GameMainMenuEntry {
   GAME_MAIN_MENU_ENTRY_PLAY,
@@ -28,7 +31,7 @@ extern const char* MAIN_MENU_ENTRY_STRINGS[GAME_MAIN_MENU_ENTRY_COUNT];
 typedef enum _GameSettingsMenuEntry {
   GAME_SETTINGS_MENU_ENTRY_START_HEALTH,
   GAME_SETTINGS_MENU_ENTRY_DIFFICULTY,
-  GAME_SETTINGS_MENU_ENTRY_BACK,
+  GAME_SETTINGS_MENU_ENTRY_SPEED,
   GAME_SETTINGS_MENU_ENTRY_COUNT,
 } GameSettingsMenuEntry;
 
@@ -84,6 +87,7 @@ typedef struct _Game {
   Shape road[LCD_WIDTH][LCD_HEIGHT];
   int8_t health;
   uint16_t points;
+  uint16_t speed;
 } Game;
 
 Game new_game();
@@ -93,7 +97,6 @@ void game_main_menu_up(Game* game);
 void game_main_menu_select(Game* game);
 void game_settings_menu_up(Game* game);
 void game_settings_menu_down(Game* game);
-void game_settings_menu_select(Game* game);
 void game_settings_menu_increase(Game* game);
 void game_settings_menu_decrease(Game* game);
 void game_over_up(Game* game);
