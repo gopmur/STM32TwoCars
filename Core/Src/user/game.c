@@ -201,7 +201,7 @@ void game_settings_menu_decrease(Game* game) {
 }
 
 void game_set_player_name(Game* game, char* name) {
-  if (game->player_name != NULL) {
+  if (game->player_name != DEFAULT_PLAYER_NAME) {
     free(game->player_name);
   }
   game->player_name = name;
