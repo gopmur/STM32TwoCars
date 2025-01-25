@@ -1,6 +1,8 @@
 #include <malloc.h>
+#include <memory.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "connectivity.uart.h"
 #include "helper.h"
@@ -15,7 +17,6 @@
 
 extern RTC_HandleTypeDef hrtc;
 
-const char* DEFAULT_PLAYER_NAME = "Player";
 const int16_t* melodies[] = {doom_melody, mario_melody, tetris_melody};
 const uint8_t MELODY_COUNT = sizeof(melodies) / sizeof(melodies[0]);
 
@@ -52,7 +53,6 @@ Game new_game() {
       .game_over_selected_entry = DEFAULT_GAME_OVER_ENTRY,
       .starting_health = DEFAULT_STARTING_HEALTH,
       .difficulty = DEFAULT_DIFFICULTY,
-      .player_name = DEFAULT_PLAYER_NAME,
       .count_down = GAME_COUNT_DOWN_START,
       .cars_position[DIRECTION_LEFT] = DIRECTION_RIGHT,
       .cars_position[DIRECTION_RIGHT] = DIRECTION_LEFT,
@@ -61,6 +61,7 @@ Game new_game() {
       .speed = GAME_MIN_SPEED_BLOCK_PER_S,
       .melody = melodies[DEFAULT_MELODY],
   };
+  strncpy(game.player_name, DEFAULT_PLAYER_NAME, PLAYER_MAX_NAME_LENGTH);
   game_clear_road(&game);
   return game;
 }
@@ -216,10 +217,10 @@ void game_settings_menu_decrease(Game* game) {
 }
 
 void game_set_player_name(Game* game, char* name) {
-  if (game->player_name != DEFAULT_PLAYER_NAME) {
-    free(game->player_name);
+  if (name == NULL || strlen(name) > PLAYER_MAX_NAME_LENGTH) {
+    return;
   }
-  game->player_name = name;
+  strncpy(game->player_name, name, PLAYER_MAX_NAME_LENGTH);
 }
 
 void game_count_down_tick(Game* game) {

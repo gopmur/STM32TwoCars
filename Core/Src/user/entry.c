@@ -66,6 +66,7 @@ void on_receive(Uart* uart, char* message, uint32_t message_length) {
       break;
     case MESSAGE_TYPE_SET_NAME:
       game_set_player_name((Game*)&game, parsed_message.value.char_p);
+      free(parsed_message.value.char_p);
       break;
     case MESSAGE_TYPE_TIME_SYN:
       rtc_syn(&hrtc, parsed_message.value.time_syn_data);

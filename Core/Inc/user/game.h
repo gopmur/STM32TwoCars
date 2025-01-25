@@ -19,6 +19,8 @@
 #define GAME_MIN_SPEED_BLOCK_PER_S 1
 #define GAME_SPEED_STEP 1
 #define CAR_LENGTH 2
+#define DEFAULT_PLAYER_NAME "Player"
+#define PLAYER_MAX_NAME_LENGTH LCD_WIDTH
 
 typedef enum _GameMainMenuEntry {
   GAME_MAIN_MENU_ENTRY_PLAY,
@@ -84,7 +86,7 @@ typedef struct _Game {
   GameDifficulty difficulty;
   uint16_t high_score;
   uint8_t count_down;
-  char* player_name;
+  char player_name[PLAYER_MAX_NAME_LENGTH + 1];
   Direction cars_position[2];
   Shape road[LCD_WIDTH][LCD_HEIGHT];
   int8_t health;
