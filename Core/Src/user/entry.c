@@ -92,7 +92,6 @@ void display_thread(void* args) {
               LCD_D4_Pin, LCD_D5_Pin, LCD_D6_Pin, LCD_D7_Pin, WIDTH, HEIGHT);
   init_custom_chars();
   lcd_clear(&lcd);
-  // osDelay(10);
   while (true) {
     ON_VAR_CHANGE(game.state, {
       lcd_clear(&lcd);
