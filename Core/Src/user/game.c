@@ -10,6 +10,7 @@
 
 #include "game.h"
 
+const char* DEFAULT_PLAYER_NAME = "Player";
 const int16_t* melodies[] = {doom_melody, mario_melody, tetris_melody};
 const uint8_t MELODY_COUNT = sizeof(melodies) / sizeof(melodies[0]);
 
