@@ -179,7 +179,7 @@ void display_thread(void* args) {
             CHAR_IF(game.speed < GAME_MAX_SPEED_BLOCK_PER_S, RIGHT_ARROW));
         break;
       case GAME_STATE_COUNT_DOWN:
-        lcd_printf(&lcd, 0, 0, "%d", game.count_down);
+        lcd_printf(&lcd, 4, 1, "Get Ready! %d", game.count_down);
         break;
       case GAME_STATE_PLAYING:
         seven_segment_set_health(seven_segment, game.health);
