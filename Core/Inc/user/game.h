@@ -108,3 +108,6 @@ void game_count_down_tick(Game* game);
 void game_cars_forward(Game* game);
 void game_left_car_turn(Game* game);
 void game_right_car_turn(Game* game);
+void game_set_difficulty(Game* game, GameDifficulty difficulty);
+void game_set_starting_health(Game* game, uint8_t starting_health);
+void game_set_speed(Game* game, uint16_t speed);

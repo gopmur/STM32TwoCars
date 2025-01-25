@@ -374,3 +374,27 @@ void game_over_select(Game* game) {
       break;
   }
 }
+
+void game_set_difficulty(Game* game, GameDifficulty difficulty) {
+  if (difficulty >= GAME_DIFFICULTY_COUNT) {
+    return;
+  }
+  game->difficulty = difficulty;
+}
+
+void game_set_starting_health(Game* game, uint8_t starting_health) {
+  if (starting_health > MAX_STARTING_HEALTH ||
+      starting_health < MIN_STARTING_HEALTH) {
+    return;
+  }
+  game->starting_health = starting_health;
+}
+
+void game_set_speed(Game* game, uint16_t speed) {
+  if (speed > GAME_MAX_SPEED_BLOCK_PER_S ||
+      speed < GAME_MIN_SPEED_BLOCK_PER_S ||
+      (speed - GAME_MIN_SPEED_BLOCK_PER_S) % GAME_SPEED_STEP != 0) {
+    return;
+  }
+  game->speed = speed;
+}

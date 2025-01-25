@@ -68,6 +68,15 @@ void on_receive(Uart* uart, char* message, uint32_t message_length) {
     case MESSAGE_TYPE_TIME_SYN:
       rtc_syn(&hrtc, parsed_message.value.time_syn_data);
       break;
+    case MESSAGE_TYPE_SET_DIFFICULTY:
+      game_set_difficulty((Game*)&game, parsed_message.value.i32);
+      break;
+    case MESSAGE_TYPE_SET_STARTING_HEALTH:
+      game_set_starting_health((Game*)&game, parsed_message.value.i32);
+      break;
+    case MESSAGE_TYPE_SET_SPEED:
+      game_set_speed((Game*)&game, parsed_message.value.i32);
+      break;
   }
 }
 
