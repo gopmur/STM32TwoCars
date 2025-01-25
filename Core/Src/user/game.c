@@ -2,13 +2,18 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include "connectivity.uart.h"
 #include "helper.h"
 #include "music_player.h"
 #include "notes.h"
+#include "rtc.h"
 
 #include "entry.h"
+#include "main.h"
 
 #include "game.h"
+
+extern RTC_HandleTypeDef hrtc;
 
 const char* DEFAULT_PLAYER_NAME = "Player";
 const int16_t* melodies[] = {doom_melody, mario_melody, tetris_melody};
@@ -86,6 +91,7 @@ void game_set_state(Game* game, GameState state) {
           GAME_SETTINGS_MENU_ENTRY_START_HEALTH;
       break;
     case GAME_STATE_PLAYING:
+      game->game_start_time = rtc_get_time(&hrtc);
       game->cars_position[DIRECTION_LEFT] = DIRECTION_RIGHT;
       game->cars_position[DIRECTION_RIGHT] = DIRECTION_LEFT;
       game->health = game->starting_health;
@@ -93,6 +99,14 @@ void game_set_state(Game* game, GameState state) {
       game_clear_road(game);
       break;
     case GAME_STATE_GAME_OVER:
+      RTC_TimeTypeDef game_end_time = rtc_get_time(&hrtc);
+      uart_send(uart, "     \r");
+      uart_sendf(uart, "log %s,%d,%d:%d:%d,%d:%d:%d,%d,%d,%d\r",
+                 game->player_name, game->points, game->game_start_time.Hours,
+                 game->game_start_time.Minutes, game->game_start_time.Seconds,
+                 game_end_time.Hours, game_end_time.Minutes,
+                 game_end_time.Seconds, game->starting_health, game->difficulty,
+                 game->speed);
       game->game_over_selected_entry = GAME_OVER_ENTRY_RESTART;
       break;
   }

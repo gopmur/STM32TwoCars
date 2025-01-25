@@ -91,6 +91,7 @@ typedef struct _Game {
   uint16_t points;
   uint16_t speed;
   int16_t* melody;
+  RTC_TimeTypeDef game_start_time;
 } Game;
 
 Game new_game();
