@@ -61,7 +61,7 @@ Game new_game() {
       .speed = GAME_MIN_SPEED_BLOCK_PER_S,
       .melody = melodies[DEFAULT_MELODY],
   };
-  strncpy(game.player_name, DEFAULT_PLAYER_NAME, PLAYER_MAX_NAME_LENGTH);
+  strncpy(game.player_name, DEFAULT_PLAYER_NAME, PLAYER_MAX_NAME_LENGTH + 1);
   game_clear_road(&game);
   return game;
 }
@@ -220,7 +220,7 @@ void game_set_player_name(Game* game, char* name) {
   if (name == NULL || strlen(name) > PLAYER_MAX_NAME_LENGTH) {
     return;
   }
-  strncpy(game->player_name, name, PLAYER_MAX_NAME_LENGTH);
+  strncpy(game->player_name, name, PLAYER_MAX_NAME_LENGTH + 1);
 }
 
 void game_count_down_tick(Game* game) {
