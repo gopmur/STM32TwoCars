@@ -18,6 +18,7 @@
 #include "rtc.h"
 #include "seven_segment.h"
 
+#include "custom_chars.h"
 #include "game.h"
 #include "keymap.h"
 #include "message_parser.h"
@@ -89,6 +90,7 @@ void display_thread(void* args) {
   Lcd lcd =
       new_lcd((GPIO_TypeDef*)LCD_PORT, LCD_RS_Pin, LCD_RW_Pin, LCD_E_Pin,
               LCD_D4_Pin, LCD_D5_Pin, LCD_D6_Pin, LCD_D7_Pin, WIDTH, HEIGHT);
+  init_custom_chars();
   while (true) {
     ON_VAR_CHANGE(game.state, {
       lcd_clear(&lcd);
@@ -154,8 +156,10 @@ void display_thread(void* args) {
       case GAME_STATE_PLAYING:
         seven_segment_set_health(seven_segment, game.health);
         seven_segment_set_points(seven_segment, game.points);
-        lcd_write(&lcd, WIDTH - 1, game.cars_position[DIRECTION_RIGHT], 'A');
-        lcd_write(&lcd, WIDTH - 2, game.cars_position[DIRECTION_RIGHT], 'A');
+        lcd_write(&lcd, WIDTH - 1, game.cars_position[DIRECTION_RIGHT],
+                  CHAR_CAR_BACK);
+        lcd_write(&lcd, WIDTH - 2, game.cars_position[DIRECTION_RIGHT],
+                  CHAR_CAR_FRONT);
 
         lcd_write(
             &lcd, WIDTH - 1, !game.cars_position[DIRECTION_RIGHT],
@@ -176,8 +180,10 @@ void display_thread(void* args) {
                     SHAPE_SQUARE
                 ? '*'
                 : ' ');
-        lcd_write(&lcd, WIDTH - 1, 2 + game.cars_position[DIRECTION_LEFT], 'A');
-        lcd_write(&lcd, WIDTH - 2, 2 + game.cars_position[DIRECTION_LEFT], 'A');
+        lcd_write(&lcd, WIDTH - 1, 2 + game.cars_position[DIRECTION_LEFT],
+                  CHAR_CAR_BACK);
+        lcd_write(&lcd, WIDTH - 2, 2 + game.cars_position[DIRECTION_LEFT],
+                  CHAR_CAR_FRONT);
 
         lcd_write(
             &lcd, WIDTH - 1, 2 + !game.cars_position[DIRECTION_LEFT],
@@ -400,6 +406,5 @@ void setup() {
   display_thread_handle = osThreadCreate(osThread(displayThread), NULL);
 
   init_sine_wave();
-
   game = new_game();
 }
