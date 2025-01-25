@@ -321,7 +321,7 @@ void main_thread(void* arg) {
         game_count_down_tick((Game*)&game);
         break;
       case GAME_STATE_PLAYING:
-        osDelay(500);
+        osDelay(1000/game.speed);
         game_cars_forward((Game*)&game);
         break;
     }
