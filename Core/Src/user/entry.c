@@ -77,6 +77,9 @@ void on_receive(Uart* uart, char* message, uint32_t message_length) {
     case MESSAGE_TYPE_SET_SPEED:
       game_set_speed((Game*)&game, parsed_message.value.i32);
       break;
+    case MESSAGE_TYPE_SET_MUSIC:
+      game_set_melody((Game*)&game, parsed_message.value.i32);
+      break;
   }
 }
 

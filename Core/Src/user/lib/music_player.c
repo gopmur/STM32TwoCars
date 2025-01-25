@@ -107,8 +107,8 @@ void music_player_play(MusicPlayer* music_player,
                        int16_t* melody,
                        float volume,
                        bool replay) {
-  if (music_player->is_active || melody == NULL || melody[0] == 0 ||
-      melody[1] != melody[0] || melody[2] == END_OF_MELODY)
+  if (melody == NULL || melody[0] == 0 || melody[1] != melody[0] ||
+      melody[2] == END_OF_MELODY)
     return;
   MusicPlayerCommand command = {
       .type = MUSIC_PLAYER_COMMAND_PLAY,
@@ -123,8 +123,6 @@ void music_player_play(MusicPlayer* music_player,
 }
 
 void music_player_stop(MusicPlayer* music_player) {
-  if (!music_player->is_active)
-    return;
   MusicPlayerCommand command = {
       .type = MUSIC_PLAYER_COMMAND_STOP,
   };
@@ -132,8 +130,6 @@ void music_player_stop(MusicPlayer* music_player) {
 }
 
 void music_player_resume(MusicPlayer* music_player) {
-  if (!music_player->is_active)
-    return;
   MusicPlayerCommand command = {
       .type = MUSIC_PLAYER_COMMAND_RESUME,
   };

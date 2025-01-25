@@ -9,6 +9,8 @@
 #define DEFAULT_GAME_OVER_ENTRY GAME_OVER_ENTRY_RESTART
 #define DEFAULT_GAME_STATE GAME_STATE_FIRST_PAGE
 #define DEFAULT_STARTING_HEALTH 3
+#define DEFAULT_PLAYER_NAME "Player"
+#define DEFAULT_MELODY 0
 #define DEFAULT_DIFFICULTY GAME_DIFFICULTY_NORMAL
 #define GAME_COUNT_DOWN_START 3
 #define MIN_DISTANCE_BETWEEN_GENERATIONS 2
@@ -89,6 +91,7 @@ typedef struct _Game {
   int8_t health;
   uint16_t points;
   uint16_t speed;
+  int16_t* melody;
 } Game;
 
 Game new_game();
@@ -111,3 +114,4 @@ void game_right_car_turn(Game* game);
 void game_set_difficulty(Game* game, GameDifficulty difficulty);
 void game_set_starting_health(Game* game, uint8_t starting_health);
 void game_set_speed(Game* game, uint16_t speed);
+void game_set_melody(Game* game, uint8_t melody);

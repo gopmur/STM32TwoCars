@@ -10,6 +10,9 @@
 
 #include "game.h"
 
+const int16_t* melodies[] = {doom_melody, mario_melody, tetris_melody};
+const uint8_t MELODY_COUNT = sizeof(melodies) / sizeof(melodies[0]);
+
 const char* MAIN_MENU_ENTRY_STRINGS[GAME_MAIN_MENU_ENTRY_COUNT] = {
     "Play",
     "Settings",
@@ -43,13 +46,14 @@ Game new_game() {
       .game_over_selected_entry = DEFAULT_GAME_OVER_ENTRY,
       .starting_health = DEFAULT_STARTING_HEALTH,
       .difficulty = DEFAULT_DIFFICULTY,
-      .player_name = NULL,
+      .player_name = DEFAULT_PLAYER_NAME,
       .count_down = GAME_COUNT_DOWN_START,
       .cars_position[DIRECTION_LEFT] = DIRECTION_RIGHT,
       .cars_position[DIRECTION_RIGHT] = DIRECTION_LEFT,
       .health = DEFAULT_STARTING_HEALTH,
       .points = 0,
       .speed = GAME_MIN_SPEED_BLOCK_PER_S,
+      .melody = melodies[DEFAULT_MELODY],
   };
   game_clear_road(&game);
   return game;
@@ -61,7 +65,7 @@ void game_set_state(Game* game, GameState state) {
   }
 
   if (state == GAME_STATE_PLAYING) {
-    music_player_play(music_player, doom_melody, 100, true);
+    music_player_play(music_player, game->melody, 100, true);
   }
 
   else {
@@ -312,7 +316,7 @@ void game_update_points(Game* game) {
     }
   }
   if (points_changed) {
-    const int16_t BASE_TEMPO = doom_melody[0];
+    const int16_t BASE_TEMPO = game->melody[0];
     int16_t tempo = BASE_TEMPO + MIN(game->points, MAX_TEMPO_SCORES) *
                                      (MAX_TEMPO - BASE_TEMPO) /
                                      MAX_TEMPO_SCORES;
@@ -397,4 +401,15 @@ void game_set_speed(Game* game, uint16_t speed) {
     return;
   }
   game->speed = speed;
+}
+
+void game_set_melody(Game* game, uint8_t melody) {
+  if (melody >= MELODY_COUNT) {
+    return;
+  }
+  if (music_player->is_active) {
+    music_player_stop(music_player);
+    music_player_play(music_player, melodies[melody], 100, true);
+  }
+  game->melody = melodies[melody];
 }
