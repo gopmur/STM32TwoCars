@@ -340,7 +340,7 @@ void game_update_points(Game* game) {
   }
 }
 
-void shift_and_generate_road(Game* game) {
+void game_shift_and_generate_road(Game* game) {
   shift_road(game);
   game_generate_shape_left(game);
   game_generate_shape_right(game);
@@ -434,4 +434,15 @@ void game_set_melody(Game* game, uint8_t melody) {
     music_player_play(music_player, melodies[melody], 100, true);
   }
   game->melody = melodies[melody];
+}
+
+void game_delete_from_name(Game* game) {
+  if (game->state != GAME_STATE_ABOUT) {
+    return;
+  }
+  uint8_t name_length = strlen(game->player_name);
+  if (name_length == 0) {
+    return;
+  }
+  game->player_name[name_length - 1] = '\0';
 }

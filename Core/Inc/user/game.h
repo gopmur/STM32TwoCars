@@ -117,4 +117,5 @@ void game_set_difficulty(Game* game, GameDifficulty difficulty);
 void game_set_starting_health(Game* game, uint8_t starting_health);
 void game_set_speed(Game* game, uint16_t speed);
 void game_set_melody(Game* game, uint8_t melody);
-void shift_and_generate_road(Game* game);
+void game_shift_and_generate_road(Game* game);
+void game_delete_from_name(Game* game);

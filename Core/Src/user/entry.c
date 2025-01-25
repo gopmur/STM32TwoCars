@@ -306,6 +306,8 @@ void handle_about_keypad(Key key) {
     case KeyBack:
       game_set_state((Game*)&game, GAME_STATE_MAIN_MENU);
       break;
+    case KeyDel:
+      game_delete_from_name((Game*)&game);
     default:
       break;
   }
@@ -382,7 +384,7 @@ void main_thread(void* arg) {
         break;
       case GAME_STATE_GAME_OVER:
       case GAME_STATE_FIRST_PAGE:
-        shift_and_generate_road((Game*)&game);
+        game_shift_and_generate_road((Game*)&game);
         osDelay(1000 / GAME_MIN_SPEED_BLOCK_PER_S);
         break;
     }
