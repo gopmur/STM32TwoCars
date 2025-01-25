@@ -306,6 +306,10 @@ void key_seq_get_char(Key key, char* entered_char, bool* next) {
   static Key last_key;
   static uint8_t seq = 0;
 
+  if (strlen(KEY_SEQ[key]) == 0) {
+    return;
+  }
+
   uint32_t current_tick = HAL_GetTick();
   if (current_tick - last_tick > 1000 || last_key != key) {
     seq = 0;
@@ -328,6 +332,7 @@ void handle_about_keypad(Key key) {
       break;
     case KeyDel:
       game_delete_from_name((Game*)&game);
+      break;
     default:
       char entered_char;
       bool next;
