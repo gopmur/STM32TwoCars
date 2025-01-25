@@ -155,6 +155,7 @@ void display_thread(void* args) {
         seven_segment_set_health(seven_segment, game.health);
         seven_segment_set_points(seven_segment, game.points);
         lcd_write(&lcd, WIDTH - 1, game.cars_position[DIRECTION_RIGHT], 'A');
+        lcd_write(&lcd, WIDTH - 2, game.cars_position[DIRECTION_RIGHT], 'A');
 
         lcd_write(
             &lcd, WIDTH - 1, !game.cars_position[DIRECTION_RIGHT],
@@ -165,7 +166,18 @@ void display_thread(void* args) {
                     SHAPE_SQUARE
                 ? '*'
                 : ' ');
+
+        lcd_write(
+            &lcd, WIDTH - 2, !game.cars_position[DIRECTION_RIGHT],
+            game.road[LCD_WIDTH - 2][!game.cars_position[DIRECTION_RIGHT]] ==
+                    SHAPE_CIRCLE
+                ? '0'
+            : game.road[LCD_WIDTH - 2][!game.cars_position[DIRECTION_RIGHT]] ==
+                    SHAPE_SQUARE
+                ? '*'
+                : ' ');
         lcd_write(&lcd, WIDTH - 1, 2 + game.cars_position[DIRECTION_LEFT], 'A');
+        lcd_write(&lcd, WIDTH - 2, 2 + game.cars_position[DIRECTION_LEFT], 'A');
 
         lcd_write(
             &lcd, WIDTH - 1, 2 + !game.cars_position[DIRECTION_LEFT],
@@ -176,7 +188,16 @@ void display_thread(void* args) {
                        [2 + !game.cars_position[DIRECTION_LEFT]] == SHAPE_SQUARE
                 ? '*'
                 : ' ');
-        for (uint8_t i = 0; i < LCD_WIDTH - 1; i++) {
+        lcd_write(
+            &lcd, WIDTH - 2, 2 + !game.cars_position[DIRECTION_LEFT],
+            game.road[LCD_WIDTH - 2][2 + !game.cars_position[DIRECTION_LEFT]] ==
+                    SHAPE_CIRCLE
+                ? '0'
+            : game.road[LCD_WIDTH - 2]
+                       [2 + !game.cars_position[DIRECTION_LEFT]] == SHAPE_SQUARE
+                ? '*'
+                : ' ');
+        for (uint8_t i = 0; i < LCD_WIDTH - 2; i++) {
           for (uint8_t j = 0; j < LCD_HEIGHT; j++) {
             lcd_write(&lcd, i, j,
                       game.road[i][j] == SHAPE_CIRCLE   ? '0'
@@ -321,7 +342,7 @@ void main_thread(void* arg) {
         game_count_down_tick((Game*)&game);
         break;
       case GAME_STATE_PLAYING:
-        osDelay(1000/game.speed);
+        osDelay(1000 / game.speed);
         game_cars_forward((Game*)&game);
         break;
     }

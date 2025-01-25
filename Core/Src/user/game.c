@@ -186,7 +186,8 @@ void game_settings_menu_decrease(Game* game) {
       }
       break;
     case GAME_SETTINGS_MENU_ENTRY_SPEED:
-      if ((int16_t)game->speed - GAME_SPEED_STEP >= GAME_MIN_SPEED_BLOCK_PER_S) {
+      if ((int16_t)game->speed - GAME_SPEED_STEP >=
+          GAME_MIN_SPEED_BLOCK_PER_S) {
         game->speed -= GAME_SPEED_STEP;
       }
       break;
@@ -272,41 +273,51 @@ void game_update_health_circle(Game* game) {
 }
 
 void game_update_health_square(Game* game) {
-  if (game->road[LCD_WIDTH - 1][game->cars_position[DIRECTION_LEFT] + 2] ==
-      SHAPE_SQUARE) {
-    game->health--;
-    game->road[LCD_WIDTH - 1][game->cars_position[DIRECTION_LEFT] + 2] =
-        SHAPE_EMPTY;
-    music_player_push(music_player, sine_wave);
-  }
-  if (game->road[LCD_WIDTH - 1][game->cars_position[DIRECTION_RIGHT]] ==
-      SHAPE_SQUARE) {
-    game->health--;
-    game->road[LCD_WIDTH - 1][game->cars_position[DIRECTION_RIGHT]] =
-        SHAPE_EMPTY;
-    music_player_push(music_player, sine_wave);
+  for (uint8_t i = 1; i <= CAR_LENGTH; i++) {
+    if (game->road[LCD_WIDTH - i][game->cars_position[DIRECTION_LEFT] + 2] ==
+        SHAPE_SQUARE) {
+      game->health--;
+      game->road[LCD_WIDTH - i][game->cars_position[DIRECTION_LEFT] + 2] =
+          SHAPE_EMPTY;
+      music_player_push(music_player, sine_wave);
+    }
+    if (game->road[LCD_WIDTH - i][game->cars_position[DIRECTION_RIGHT]] ==
+        SHAPE_SQUARE) {
+      game->health--;
+      game->road[LCD_WIDTH - i][game->cars_position[DIRECTION_RIGHT]] =
+          SHAPE_EMPTY;
+      music_player_push(music_player, sine_wave);
+    }
   }
 }
 
 void game_update_points(Game* game) {
-  if (game->road[LCD_WIDTH - 1][game->cars_position[DIRECTION_LEFT] + 2] ==
-      SHAPE_CIRCLE) {
-    game->points++;
-    game->road[LCD_WIDTH - 1][game->cars_position[DIRECTION_LEFT] + 2] =
-        SHAPE_EMPTY;
-    music_player_push(music_player, sine_wave);
+  bool points_changed = false;
+  for (uint8_t i = 1; i <= CAR_LENGTH; i++) {
+    if (game->road[LCD_WIDTH - i][game->cars_position[DIRECTION_LEFT] + 2] ==
+        SHAPE_CIRCLE) {
+      game->points++;
+      points_changed = true;
+      game->road[LCD_WIDTH - i][game->cars_position[DIRECTION_LEFT] + 2] =
+          SHAPE_EMPTY;
+      music_player_push(music_player, sine_wave);
+    }
+    if (game->road[LCD_WIDTH - i][game->cars_position[DIRECTION_RIGHT]] ==
+        SHAPE_CIRCLE) {
+      game->points++;
+      points_changed = true;
+      game->road[LCD_WIDTH - i][game->cars_position[DIRECTION_RIGHT]] =
+          SHAPE_EMPTY;
+      music_player_push(music_player, sine_wave);
+    }
   }
-  if (game->road[LCD_WIDTH - 1][game->cars_position[DIRECTION_RIGHT]] ==
-      SHAPE_CIRCLE) {
-    game->points++;
-    game->road[LCD_WIDTH - 1][game->cars_position[DIRECTION_RIGHT]] =
-        SHAPE_EMPTY;
-    music_player_push(music_player, sine_wave);
+  if (points_changed) {
+    const int16_t BASE_TEMPO = doom_melody[0];
+    int16_t tempo = BASE_TEMPO + MIN(game->points, MAX_TEMPO_SCORES) *
+                                     (MAX_TEMPO - BASE_TEMPO) /
+                                     MAX_TEMPO_SCORES;
+    music_player_set_tempo(music_player, tempo);
   }
-  const int16_t BASE_TEMPO = doom_melody[0];
-  int16_t tempo = BASE_TEMPO + MIN(game->points, MAX_TEMPO_SCORES) *
-                                   (MAX_TEMPO - BASE_TEMPO) / MAX_TEMPO_SCORES;
-  music_player_set_tempo(music_player, tempo);
 }
 
 void game_cars_forward(Game* game) {

@@ -17,6 +17,7 @@
 #define GAME_MAX_SPEED_BLOCK_PER_S 10
 #define GAME_MIN_SPEED_BLOCK_PER_S 1
 #define GAME_SPEED_STEP 1
+#define CAR_LENGTH 2
 
 typedef enum _GameMainMenuEntry {
   GAME_MAIN_MENU_ENTRY_PLAY,
