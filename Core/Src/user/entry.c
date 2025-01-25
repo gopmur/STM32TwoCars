@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "LiquidCrystal.h"
 
@@ -55,6 +56,7 @@ void on_receive(Uart* uart, char* message, uint32_t message_length) {
   switch (parsed_message.type) {
     case MESSAGE_TYPE_SET_SECONDS:
       rtc_set_seconds(&hrtc, parsed_message.value.i32);
+      srand(parsed_message.value.i32);
       break;
     case MESSAGE_TYPE_SET_MINUTES:
       rtc_set_minutes(&hrtc, parsed_message.value.i32);
@@ -67,6 +69,7 @@ void on_receive(Uart* uart, char* message, uint32_t message_length) {
       break;
     case MESSAGE_TYPE_TIME_SYN:
       rtc_syn(&hrtc, parsed_message.value.time_syn_data);
+      srand(parsed_message.value.time_syn_data.second);
       break;
     case MESSAGE_TYPE_SET_DIFFICULTY:
       game_set_difficulty((Game*)&game, parsed_message.value.i32);
@@ -111,7 +114,19 @@ void display_thread(void* args) {
     });
     switch (game.state) {
       case GAME_STATE_FIRST_PAGE:
-        lcd_print(&lcd, 0, 0, "Two Cars");
+        lcd_print(&lcd, 6, 1, "Two");
+        lcd_print(&lcd, 10, 1, "Cars");
+        for (uint8_t i = 0; i < LCD_WIDTH; i++) {
+          for (uint8_t j = 0; j < LCD_HEIGHT; j++) {
+            if (j == 1 && ((i >= 6 && i < 9) || (i >= 10 && i < 14))) {
+              continue;
+            }
+            lcd_write(&lcd, i, j,
+                      game.road[i][j] == SHAPE_CIRCLE   ? CHAR_CIRCLE
+                      : game.road[i][j] == SHAPE_SQUARE ? CHAR_SQUARE
+                                                        : ' ');
+          }
+        }
         break;
       case GAME_STATE_MAIN_MENU:
         lcd_print(&lcd, 0, 0, "Main Menu");
@@ -364,6 +379,11 @@ void main_thread(void* arg) {
         osDelay(1000 / game.speed);
         game_cars_forward((Game*)&game);
         break;
+      case GAME_STATE_GAME_OVER:
+      case GAME_STATE_FIRST_PAGE:
+        shift_and_generate_road((Game*)&game);
+        osDelay(1000 / GAME_MIN_SPEED_BLOCK_PER_S);
+        break;
     }
   }
 }
@@ -417,6 +437,8 @@ void setup() {
 
   osThreadDef(displayThread, display_thread, osPriorityNormal, 0, 128 * 2);
   display_thread_handle = osThreadCreate(osThread(displayThread), NULL);
+
+  srand(rtc_get_time(&hrtc).Seconds);
 
   init_sine_wave();
   game = new_game();

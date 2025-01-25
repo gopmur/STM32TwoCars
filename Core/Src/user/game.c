@@ -339,6 +339,12 @@ void game_update_points(Game* game) {
   }
 }
 
+void shift_and_generate_road(Game* game) {
+  shift_road(game);
+  game_generate_shape_left(game);
+  game_generate_shape_right(game);
+}
+
 void game_cars_forward(Game* game) {
   game_update_health_circle(game);
   shift_road(game);
