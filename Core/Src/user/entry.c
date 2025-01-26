@@ -27,7 +27,9 @@
 extern UART_HandleTypeDef huart1;
 extern TIM_HandleTypeDef htim2;
 extern RTC_HandleTypeDef hrtc;
+extern ADC_HandleTypeDef hadc1;
 
+ADC_HandleTypeDef* volume_adc = &hadc1;
 TIM_HandleTypeDef* buzzer_timer = &htim2;
 
 Pwm buzzer;
@@ -38,6 +40,20 @@ SevenSegment* seven_segment;
 volatile Game game;
 
 osThreadId display_thread_handle;
+osThreadId adc_thread_handle;
+
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
+  vTaskNotifyGiveFromISR(adc_thread_handle, NULL);
+}
+
+void adc_thread(ADC_HandleTypeDef* adc) {
+  while (true) {
+    HAL_ADC_Start_IT(adc);
+    ulTaskNotifyTake(true, portMAX_DELAY);
+    uint16_t value = HAL_ADC_GetValue(adc);
+    osDelay(100); 
+  }
+}
 
 void seven_segment_set_health(SevenSegment* seven_segment, uint8_t health) {
   seven_segment->digits[0] = health;
@@ -469,6 +485,9 @@ void setup() {
 
   osThreadDef(displayThread, display_thread, osPriorityNormal, 0, 128 * 2);
   display_thread_handle = osThreadCreate(osThread(displayThread), NULL);
+
+  osThreadDef(AdcThread, adc_thread, osPriorityNormal, 0, 128 * 2);
+  adc_thread_handle = osThreadCreate(osThread(AdcThread), volume_adc);
 
   srand(rtc_get_time(&hrtc).Seconds);
 
