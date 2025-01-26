@@ -55,7 +55,6 @@ void adc_thread(ADC_HandleTypeDef* adc) {
     ulTaskNotifyTake(true, portMAX_DELAY);
     uint16_t value = HAL_ADC_GetValue(adc);
     float volume = map(value, MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 100);
-    uart_sendf(uart, "value: %d, volume: %d\n", value, (uint8_t)volume);
     music_player_set_volume(music_player, volume);
     osDelay(100);
   }
