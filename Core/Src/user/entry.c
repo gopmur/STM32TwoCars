@@ -417,6 +417,11 @@ void keypad_callback(uint8_t i, uint8_t j) {
 }
 
 void main_thread(void* arg) {
+  music_player_play(music_player, doom_melody, 100, true);
+  osDelay(3000);
+  music_player_set_volume(music_player, 20);
+  osDelay(3000);
+  music_player_set_volume(music_player, 1);
   while (true) {
     switch (game.state) {
       case GAME_STATE_COUNT_DOWN:

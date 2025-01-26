@@ -59,6 +59,7 @@ typedef struct _MusicPlayer {
   uint16_t stored_tempo;
   bool melody_pushed;
   QueueHandle_t command_queue;
+  SemaphoreHandle_t volume_mutex;
 } MusicPlayer;
 
 MusicPlayer* new_music_player(Pwm* device);
@@ -69,3 +70,4 @@ void music_player_play(MusicPlayer* music_player,
 void music_player_stop(MusicPlayer* music_player);
 void music_player_set_tempo(MusicPlayer* music_player, int16_t tempo);
 void music_player_push(MusicPlayer* music_player, int16_t* melody);
+void music_player_set_volume(MusicPlayer* music_player, float volume);
