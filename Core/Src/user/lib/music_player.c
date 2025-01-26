@@ -59,6 +59,7 @@ void music_player_thread(MusicPlayer* music_player) {
     if (command.type != MUSIC_PLAYER_COMMAND_PLAY) {
       continue;
     }
+    music_player->melody_pushed = false;
     music_player->is_active = true;
     music_player_load_melody(music_player, command.data.play.melody);
     music_player->volume = command.data.play.volume;
