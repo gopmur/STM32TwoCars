@@ -50,7 +50,8 @@ void adc_thread(ADC_HandleTypeDef* adc) {
   const uint16_t MIN_ADC_VALUE = 800;
   const uint16_t MAX_ADC_VALUE = 3950;
   while (true) {
-    while (!music_player->is_active);
+    while (!music_player->is_active)
+      ;
     HAL_ADC_Start_IT(adc);
     ulTaskNotifyTake(true, portMAX_DELAY);
     uint16_t value = HAL_ADC_GetValue(adc);
@@ -327,19 +328,17 @@ void key_seq_get_char(Key key, char* entered_char, bool* next) {
   static Key last_key;
   static uint8_t seq = 0;
 
-  if (strlen(KEY_SEQ[key]) == 0) {
-    return;
-  }
-
   uint32_t current_tick = HAL_GetTick();
-  if (current_tick - last_tick > 1000 || last_key != key) {
-    seq = 0;
-    *next = true;
-  } else {
-    if (seq < strlen(KEY_SEQ[key]) - 1) {
-      seq++;
+  if (strlen(KEY_SEQ[key]) != 0) {
+    if (current_tick - last_tick > 1000 || last_key != key) {
+      seq = 0;
+      *next = true;
+    } else {
+      if (seq < strlen(KEY_SEQ[key]) - 1) {
+        seq++;
+      }
+      *next = false;
     }
-    *next = false;
   }
   *entered_char = KEY_SEQ[key][seq];
   last_key = key;
@@ -353,7 +352,6 @@ void handle_about_keypad(Key key) {
       break;
     case KeyDel:
       game_delete_from_name((Game*)&game);
-      break;
     default:
       char entered_char;
       bool next;
