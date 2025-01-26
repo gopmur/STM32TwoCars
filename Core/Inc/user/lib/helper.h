@@ -36,8 +36,7 @@
     }                                  \
   }
 
-#define CHAR_IF(condition, character) condition ? character : ' '  
-
+#define CHAR_IF(condition, character) condition ? character : ' '
 
 void start_timer_by_period_ms_it(TIM_HandleTypeDef* timer,
                                  uint32_t period_ms,
@@ -55,3 +54,8 @@ uint32_t flatten_2d_index(uint32_t i, uint32_t j, uint32_t width);
 uint32_t time_to_seconds(RTC_TimeTypeDef time);
 uint32_t get_time_difference_in_seconds(RTC_TimeTypeDef future_time,
                                         RTC_TimeTypeDef past_time);
+float map(uint32_t value,
+          uint32_t value_start,
+          uint32_t value_end,
+          float out_start,
+          float out_end);

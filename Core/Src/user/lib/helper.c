@@ -78,3 +78,18 @@ uint32_t get_time_difference_in_seconds(RTC_TimeTypeDef future_time,
              ? future_time_in_seconds - past_time_in_seconds
              : 24 * 3600 + future_time_in_seconds - past_time_in_seconds;
 }
+
+float map(uint32_t value,
+          uint32_t value_start,
+          uint32_t value_end,
+          float out_start,
+          float out_end) {
+  value = MIN(value, value_end);
+  value = MAX(value, value_start);
+  float out = ((float)(value - value_start) / (value_end - value_start)) *
+                  (out_end - out_start) +
+              out_start;
+  out = MIN(out, out_end);
+  out = MAX(out, out_start);
+  return out;
+}

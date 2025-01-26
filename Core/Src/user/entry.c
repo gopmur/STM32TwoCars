@@ -47,11 +47,17 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
 }
 
 void adc_thread(ADC_HandleTypeDef* adc) {
+  const uint16_t MIN_ADC_VALUE = 800;
+  const uint16_t MAX_ADC_VALUE = 3950;
   while (true) {
+    while (!music_player->is_active);
     HAL_ADC_Start_IT(adc);
     ulTaskNotifyTake(true, portMAX_DELAY);
     uint16_t value = HAL_ADC_GetValue(adc);
-    osDelay(100); 
+    float volume = map(value, MIN_ADC_VALUE, MAX_ADC_VALUE, 0, 100);
+    uart_sendf(uart, "value: %d, volume: %d\n", value, (uint8_t)volume);
+    music_player_set_volume(music_player, volume);
+    osDelay(100);
   }
 }
 
@@ -417,11 +423,6 @@ void keypad_callback(uint8_t i, uint8_t j) {
 }
 
 void main_thread(void* arg) {
-  music_player_play(music_player, doom_melody, 100, true);
-  osDelay(3000);
-  music_player_set_volume(music_player, 20);
-  osDelay(3000);
-  music_player_set_volume(music_player, 1);
   while (true) {
     switch (game.state) {
       case GAME_STATE_COUNT_DOWN:

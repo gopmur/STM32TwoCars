@@ -66,7 +66,7 @@ void pwm_set_duty_cycle(Pwm* pwm, float duty_cycle) {
 }
 
 void buzzer_set_volume(Buzzer* buzzer, float volume) {
-  pwm_set_duty_cycle(buzzer, volume / 40);
+  pwm_set_duty_cycle(buzzer, (powf(volume, 3)) / powf(100, 3));
 }
 
 void pwm_start(Pwm* pwm) {

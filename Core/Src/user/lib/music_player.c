@@ -157,9 +157,8 @@ void music_player_push(MusicPlayer* music_player, int16_t* melody) {
 }
 
 void music_player_set_volume(MusicPlayer* music_player, float volume) {
-  if (volume > 100 || volume < 0) {
-    return;
-  }
+  volume = MIN(volume, 100);
+  volume = MAX(volume, 0);
   if (xSemaphoreTake(music_player->volume_mutex, portMAX_DELAY)) {
     buzzer_set_volume(music_player->device, volume);
     music_player->volume = volume;
